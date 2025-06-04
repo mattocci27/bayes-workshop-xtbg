@@ -1,8 +1,8 @@
 ---
 pagetitle: "Bayesian estimation for ecology"
 author: "Masatoshi Katabuchi"
-date: "November 10, 2024"
-host: "XTBG AFEC"
+date: "June 14, 2025"
+host: "The 8th Advanced Statistics Workshop Course 2025, XTBG"
 institute: "XTBG, CAS"
 strip-comments: true
 format:
@@ -72,9 +72,8 @@ hoge
 
   - Why multilevel models are important
 
-- We Do Not Learn
-
   - How to use and code Bayesian models in Stan and R
+
 :::
 :::
 
@@ -84,6 +83,25 @@ hoge
 - idea of Bayesian in ecology
 :::
 
+## Outline: From Likelihood to Hierachical Bayesian Models in Ecology
+
+### 🧠Bayesian Foundations
+
+- Likelihood
+
+- Multilevel Models (Conceptual Motivation)
+
+- Conditional Probability and Bayes's Theorem
+
+- Prior
+
+### Modeling with Stan
+
+- Tools for Bayesian Modeling
+
+- Bayesian Estimation of Simple Models (with Stan)
+
+- Multilevel Model Revisited (with Stan)
 
 # Likelihood
 
@@ -232,17 +250,7 @@ tibble(x, y) |>
 
 ---
 
-## Outline
-
-- Multilevel Model
-
-- Conditional Probability and Bayes's Theorem
-
-- Prior
-
-- Multilevel Model Revisited
-
-# Multilevel Models
+# Multilevel Models (Conceptual Motivation)
 
 ---
 
@@ -262,6 +270,7 @@ tibble(x, y) |>
 
 ::: footer
 [1] Comita, L. S., Muller-Landau, H. C., Aguilar, S. & Hubbell, S. P. Asymmetric density dependence shapes species abundances in a tropical tree community. Science 329, 330–2 (2010).
+
 :::
 
 ---
@@ -270,7 +279,10 @@ tibble(x, y) |>
 ## Multilevel model (NDD: verbal model)
 
 ::: footer
-Inspired by [1] Comita, L. S., Muller-Landau, H. C., Aguilar, S. & Hubbell, S. P. Asymmetric density dependence shapes species abundances in a tropical tree community. Science 329, 330–2 (2010).
+Example inspired by
+[Comita *et al.* 2010 *Science*](https://doi.org/10.1126/science.1190772)
+and
+[Song & Katabuchi *et al.* 2024 *Ecology*](https://doi.org/10.1002/ecy.4382)
 :::
 
 ::: small
@@ -334,6 +346,7 @@ p1 + p2 + p3
 ::: footer
 Inspired by [1]
 Martínez Cano *et al.* Tropical Tree Height and Crown Allometries for the Barro Colorado Nature Monument, Panama: A Comparison of Alternative Hierarchical Models Incorporating Interspecific Variation in Relation to Life History Traits. Biogeosciences 16, 847–62 (2019).
+
 :::
 
 ::: small
