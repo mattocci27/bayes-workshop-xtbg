@@ -1,8 +1,8 @@
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 
-# AFEC2023: Bayesian estimation for ecology
+# The 8th Advanced Statistics Workshop: Bayesian estimation for ecology
 
-Slides and materials for 2023-11-17 AFEC at XTBG.
+Slides and materials for 2025-06-14 at XTBG.
 
 View the accompanying slides [here](https://forest-canopy.github.io/assets/bayes-afec/main.html)
 
