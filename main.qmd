@@ -584,7 +584,7 @@ $$
 
 - Forward / inverse problems
 
-- Bayes revisit
+- Revisiting Bayes
 
 ---
 
@@ -701,7 +701,7 @@ $$
 e.g.,
 
 - P(hangover) = 4%
-- P(hangover | beer) = 6%.
+- P(baiju) = 1.5%
 - P(hangover | baiju) = 85%.
 :::
 
