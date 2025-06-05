@@ -444,40 +444,60 @@
 <p>“…rare species suffered more from the presence of conspecific neighbors than common species did, suggesting that conspecific density dependence shapes species abundances in diverse communities.”</p>
 <p>- Comita et al.&nbsp;2010 -</p>
 </div></div>
+<div class="fragment">
+<p>NDD can maintain devisiety in communities by preventing common species from dominating the community.</p>
+</div>
 <div class="footer">
-<p>[1] Comita, L. S., Muller-Landau, H. C., Aguilar, S. &amp; Hubbell, S. P. Asymmetric density dependence shapes species abundances in a tropical tree community. Science 329, 330–2 (2010).</p>
+<p><a href="https://doi.org/10.1126/science.1190772">Comita <em>et al.</em> 2010 <em>Science</em></a></p>
 </div>
 </section>
-<section id="multilevel-model-ndd-verbal-model" class="slide level2">
-<h2>Multilevel model (NDD: verbal model)</h2>
+<section id="multilevel-model-verbal-model-ndd-example" class="slide level2">
+<h2>Multilevel model (verbal model: NDD example)</h2>
 <div class="footer">
 <p>Example inspired by <a href="https://doi.org/10.1126/science.1190772">Comita <em>et al.</em> 2010 <em>Science</em></a> and <a href="https://doi.org/10.1002/ecy.4382">Song &amp; Katabuchi <em>et al.</em> 2024 <em>Ecology</em></a></p>
+<p>Conspecific density and species abundance are scaled (mean = 0, sd = 1).</p>
 </div>
 <div class="small">
+<p><em>Rare species tend to be rare because they suffer stronger conspecific NDD than common species.</em></p>
+<div class="fragment">
 <p>There is negative density dependence (NDD) of seedling survival rate, and the strength of NDD varies among species. The strength of NDD depends on species abundance.</p>
+</div>
+<div class="fragment">
 <ul>
-<li>Model survival rates as a function of conspecific seedling density (individual-level).</li>
-<li>Model the strength of NDD (i.e., slopes) as a function of species abundance (group-level).</li>
+<li>Survival rates <em>p</em> ~ conspecific density <em>x</em> (individual-level, logistic regression).</li>
 </ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Slopes <em>b</em> ~ species abundance (species-level).</li>
+</ul>
+</div>
 </div>
 
 <img data-src="figure/unnamed-chunk-6-1.png" class="quarto-figure quarto-figure-center r-stretch" width="1440"></section>
-<section id="multilevel-model-tree-allometry-verbal-model" class="slide level2">
-<h2>Multilevel model (tree allometry: verbal model)</h2>
+<section id="multilevel-model-verbal-model-tree-allometry-example" class="slide level2">
+<h2>Multilevel model (verbal model: tree allometry example)</h2>
 <div class="footer">
-<p>Inspired by [1] Martínez Cano <em>et al.</em> Tropical Tree Height and Crown Allometries for the Barro Colorado Nature Monument, Panama: A Comparison of Alternative Hierarchical Models Incorporating Interspecific Variation in Relation to Life History Traits. Biogeosciences 16, 847–62 (2019).</p>
+<p>Example inspired by Nguyen &amp; Katabuchi <em>Journal of Forestry Research</em> (accepted)</p>
+<p>Wood density is scaled (mean = 0, sd = 1).</p>
 </div>
 <div class="small">
-<p>There is a power-law relationship (<span class="math inline">\(y = ax^b\)</span>) between tree diameter (DBH) and crown area, and the power-law exponent varies among species. Those relationships depend on wood density.</p>
+<p><em>Dense wood can support taller trees than less dense wood.</em></p>
+<div class="fragment">
+<p>There is a power-law relationship (<span class="math inline">\(y =ax^b\)</span>) between tree diameter (DBH) and tree maximum height, and the power-law exponent varies among species. Those relationships depend on wood density.</p>
+</div>
 <ul>
-<li><p>Model crown area as a function of DBH (individual-level).</p></li>
-<li><p>Model the coefficient <em>b</em> as a function of wood density (group-level).</p></li>
+<li class="fragment"><p>Tree height <em>y</em> ~ DBH <em>x</em> (individual-level)</p></li>
+<li class="fragment"><p>Slope <em>b</em> ~ wood density (species-level)</p></li>
 </ul>
 </div>
 
 <img data-src="figure/unnamed-chunk-7-1.png" class="quarto-figure quarto-figure-center r-stretch" width="1440"></section>
-<section id="multilevel-model-mle-non-verbal-dummy-model-1" class="slide level2">
-<h2>Multilevel model (MLE: non-verbal ‘dummy’ model 1)</h2>
+<section id="multilevel-model-code-implementation-two-stage-mle" class="slide level2">
+<h2>Multilevel model (code implementation: two-stage MLE)</h2>
+<div class="footer">
+<p>e.g., <a href="https://doi.org/10.1111/1365-2745.13497">Song <em>et al.</em> 2021 <em>Journal of Ecology</em></a>, <a href="https://doi.org/10.1002/ecy.3808">Jevon <em>et al.</em> 2022 <em>Ecology</em></a></p>
+</div>
 <h3 id="individual-level-model-glmm">Individual-level model: GLMM</h3>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a>fit_ind <span class="ot">&lt;-</span> lme4<span class="sc">::</span><span class="fu">glmer</span>(</span>

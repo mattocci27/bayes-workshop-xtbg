@@ -265,33 +265,52 @@ tibble(x, y) |>
 "...rare species suffered more from the presence of conspecific neighbors than common species did, suggesting that conspecific density dependence shapes species abundances in diverse communities."
 
 \-                    Comita et al. 2010 \-
+
 :::
 :::
+
+::: fragment
+NDD can maintain devisiety in communities by preventing common species from dominating the community.
+:::
+
 
 ::: footer
-[1] Comita, L. S., Muller-Landau, H. C., Aguilar, S. & Hubbell, S. P. Asymmetric density dependence shapes species abundances in a tropical tree community. Science 329, 330–2 (2010).
-
+[Comita *et al.* 2010 *Science*](https://doi.org/10.1126/science.1190772)
 :::
 
 ---
 
-
-## Multilevel model (NDD: verbal model)
+## Multilevel model (verbal model: NDD example)
 
 ::: footer
 Example inspired by
 [Comita *et al.* 2010 *Science*](https://doi.org/10.1126/science.1190772)
 and
 [Song & Katabuchi *et al.* 2024 *Ecology*](https://doi.org/10.1002/ecy.4382)
+
+Conspecific density and species abundance are scaled (mean = 0, sd = 1).
 :::
 
 ::: small
+
+*Rare species tend to be rare because they suffer stronger conspecific NDD than common species.*
+
+::: fragment
 There is negative density dependence (NDD) of seedling survival rate, and the strength of NDD varies among species.
 The strength of NDD depends on species abundance.
-
-- Model survival rates as a function of conspecific seedling density (individual-level).
-- Model the strength of NDD (i.e., slopes) as a function of species abundance (group-level).
 :::
+
+::: fragment
+- Survival rates *p* ~ conspecific density *x* (individual-level, logistic regression).
+:::
+
+::: fragment
+- Slopes *b* ~ species abundance (species-level).
+:::
+
+:::
+
+
 
 ```{r, echo=FALSE, fig.width=15, fig.height=5, fig.retina=3}
 set.seed(123)
@@ -320,6 +339,7 @@ p1 <- tmp |>
   geom_line() +
   xlab("Conspecific density") +
   ylab("Survival rates") +
+  ggtitle("p = logistic(ax + b)") +
   theme(legend.position = "none")
 
 p2 <- tmp |>
@@ -327,6 +347,7 @@ p2 <- tmp |>
   geom_line() +
   xlab("Conspecific density") +
   ylab("logit(Survival rates)") +
+  ggtitle("logit(p) = ax + b") +
   theme(legend.position = "none")
 
 p3 <- tmp2 |>
@@ -341,21 +362,33 @@ p3 <- tmp2 |>
 
 p1 + p2 + p3
 ```
-## Multilevel model (tree allometry: verbal model)
+
+
+---
+
+## Multilevel model (verbal model: tree allometry example)
 
 ::: footer
-Inspired by [1]
-Martínez Cano *et al.* Tropical Tree Height and Crown Allometries for the Barro Colorado Nature Monument, Panama: A Comparison of Alternative Hierarchical Models Incorporating Interspecific Variation in Relation to Life History Traits. Biogeosciences 16, 847–62 (2019).
+Example inspired by
+Nguyen & Katabuchi *Journal of Forestry Research* (accepted)
 
+Wood density is scaled (mean = 0, sd = 1).
 :::
 
 ::: small
-There is a power-law relationship ($y = ax^b$) between tree diameter (DBH) and crown area, and the power-law exponent varies among species.
+
+*Dense wood can support taller trees than less dense wood.*
+
+::: fragment
+There is a power-law relationship ($y =ax^b$) between tree diameter (DBH) and tree maximum height, and the power-law exponent varies among species.
 Those relationships depend on wood density.
+:::
 
-- Model crown area as a function of DBH (individual-level).
+::: incremental
+- Tree height *y* ~ DBH *x* (individual-level)
 
-- Model the coefficient *b* as a function of wood density (group-level).
+- Slope *b* ~ wood density (species-level)
+:::
 :::
 
 ```{r, echo=FALSE, fig.width=15, fig.height=5, fig.retina=3}
@@ -364,7 +397,7 @@ set.seed(12345)
 n_sp <- 10
 n_rep <- 80
 trait <- rnorm(n_sp, 0, 1)
-gamma0 <- 1.35
+gamma0 <- 0.6
 gamma1 <- 0.05
 b1_hat <- gamma1 * trait + gamma0
 b1 <- rnorm(n_sp, b1_hat, 0.01)
@@ -384,7 +417,7 @@ p1 <- tmp |>
   ggplot(aes(x = x, y = y, col = sp)) +
   geom_line() +
   xlab("DBH (cm)") +
-  ylab(expression("Crown area (m"^2*")")) +
+  ylab(expression("Height (m)")) +
   ggtitle(expression("y = ax"^b)) +
   theme(
     legend.position = "none",
@@ -396,7 +429,7 @@ p2 <- tmp |>
   ggplot(aes(x = x, y = y, col = sp)) +
   geom_line() +
   xlab("DBH (cm)") +
-  ylab(expression("Crown area (m"^2*")")) +
+  ylab(expression("Height (m)")) +
   ggtitle("log(y) = log(a) + b log(x)") +
   scale_x_log10() +
   scale_y_log10() +
@@ -420,7 +453,13 @@ p1 + p2 + p3
 
 ---
 
-## Multilevel model (MLE: non-verbal 'dummy' model 1)
+## Multilevel model (code implementation: two-stage MLE)
+
+::: footer
+e.g.,
+[Song *et al.* 2021 *Journal of Ecology*](https://doi.org/10.1111/1365-2745.13497),
+[Jevon *et al.* 2022 *Ecology*](https://doi.org/10.1002/ecy.3808)
+:::
 
 ```{r, echo=FALSE, eval=FALSE}
 library(tidyverse)
@@ -447,7 +486,7 @@ fit_gr <- lm(slope_coef ~  abund, data = new_data)
 :::
 
 ::: incremental
-- This method have low statistical power
+- This method has low statistical power
 :::
 
 ---
