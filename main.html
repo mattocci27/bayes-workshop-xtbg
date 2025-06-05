@@ -806,8 +806,9 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 <h1>Prior</h1>
 
 <img data-src="figure/unnamed-chunk-17-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"></section>
-<section id="prior-coins" class="slide level2">
-<h2>Prior (coins)</h2>
+<section id="prior-vs.-data-mle-and-bayesian-comparison-coin-toss" class="slide level2">
+<h2>Prior vs.&nbsp;Data: MLE and Bayesian comparison (Coin Toss)</h2>
+<p>We compare two coins, A and B, with the same prior but different likelihood (due to data sizes) to illustrate how prior beliefs influence posterior estimates.</p>
 <h3 id="mle">MLE</h3>
 <ul>
 <li>A: 2 head out of 3 tosses -&gt; 2/3 = 0.666</li>
@@ -838,31 +839,33 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 </div></div>
 </div>
 </section>
-<section id="prior-coins-1" class="slide level2">
-<h2>Prior (coins)</h2>
+<section id="bayesian-update-with-prior-coin-toss" class="slide level2">
+<h2>Bayesian Update with Prior (Coin Toss)</h2>
+<p>Posteiror <span class="math inline">\(\propto\)</span> Likelihood <span class="math inline">\(\times\)</span> Prior</p>
 <div class="columns">
 <div class="column" style="width:50%;">
+<div class="fragment">
+<p>Parameter <em>p</em> that maximizes the posterior of coin A. <span class="math inline">\(Post_A \propto p^2 (1-p)^1 \times p^{50} (1-p)^{50}\)</span> <span class="math inline">\(p = 52/103 \approx 0.505\)</span></p>
+</div>
+<div class="fragment">
 <ul>
-<li class="fragment"><p><span class="math inline">\(Post_A \propto p^2 (1-p)^1 \times p^{50} (1-p)^{50}\)</span></p>
-<ul>
-<li class="fragment"><p><span class="math inline">\(Post_A \propto p^{52} (1-p)^{51}\)</span></p></li>
-<li class="fragment"><p><span class="math inline">\(Post_A' = 52p^{51}(1-p)^{51}-\)</span> <span class="math inline">\(51p^{52}(1-p)^{50}\)</span></p></li>
-<li class="fragment"><p>p = 52/103 = 0.5048</p></li>
-</ul></li>
-<li class="fragment"><p><span class="math inline">\(Post_B \propto p^{60} (1-p)^{40} \times p^{50} (1-p)^{50}\)</span></p>
-<ul>
-<li class="fragment"><p><span class="math inline">\(Post_B \propto p^{110} (1-p)^{90}\)</span></p></li>
-<li class="fragment"><p>p = 110/200 = 0.55</p></li>
-</ul></li>
+<li><span class="math inline">\(Post_A\)</span>: With only 3 coin tosses, the likelihood is weak, so the posterior stays close to the prior.</li>
 </ul>
+</div>
 </div><div class="column" style="width:50%;">
+<div class="fragment">
+<p>Parameter <em>p</em> that maximizes the posterior of coin B. <span class="math inline">\(Post_B \propto p^{60} (1-p)^{40} \times p^{50} (1-p)^{50}\)</span> <span class="math inline">\(p = 110/200 = 0.55\)</span></p>
+</div>
+<div class="fragment">
 <ul>
-<li class="fragment"><span class="math inline">\(Like_B\)</span>: 60 heads out of 100 tosses</li>
-<li class="fragment"><span class="math inline">\(Prior_B\)</span>: P(H) is about 50%, a reasonable assumption based on existing knowledge of coins</li>
-<li class="fragment"><span class="math inline">\(Post_B\)</span>: P(H) is likely between 50% and 60% (55% in this example)</li>
-<li class="fragment">We usually have some sense of a scale about parameters, we can legally use that information</li>
+<li><span class="math inline">\(Post_B\)</span>: With 100 coin tosses, the likelihood dominates, so the posterior shifts more towards the data.</li>
 </ul>
+</div>
 </div></div>
+<ul>
+<li class="fragment">We usually have some sense of a scale about parameters, we can legally use that information.</li>
+<li class="fragment">The same prior can have a strong or weak influence depending on how much data we have.</li>
+</ul>
 </section>
 <section id="priors-and-ecology-simple-linear-model-y-ax-b" class="slide level2">
 <h2>Priors and ecology (simple linear model; <em>y</em> = <em>ax</em> + <em>b</em>)</h2>

@@ -913,7 +913,8 @@ p1
 ggsave("images/priors.png", p1, width = 10, height = 6)
 ```
 
-## Prior (coins)
+##  Prior vs. Data: MLE and Bayesian comparison (Coin Toss)
+We compare two coins, A and B, with the same prior but different likelihood (due to data sizes) to illustrate how prior beliefs influence posterior estimates.
 
 ### MLE
 
@@ -957,35 +958,46 @@ tibble(x, prior = y * 10^29.5) %>%
 
 ---
 
-## Prior (coins)
+##  Bayesian Update with Prior (Coin Toss)
+
+Posteiror $\propto$ Likelihood $\times$ Prior
 
 ::: columns
-::: {.column width=50%}
+::: {.column width="50%"}
+
+
+::: fragment
+Parameter *p* that maximizes the posterior of coin A.
+$Post_A \propto p^2 (1-p)^1 \times p^{50} (1-p)^{50}$
+$p = 52/103 \approx 0.505$
+:::
+::: fragment
+- $Post_A$: With only 3 coin tosses, the likelihood is weak, so the posterior stays close to the prior.
+:::
+:::
+
+::: {.column width="50%"}
+::: fragment
+Parameter *p* that maximizes the posterior of coin B.
+$Post_B \propto p^{60} (1-p)^{40} \times p^{50} (1-p)^{50}$
+$p = 110/200 = 0.55$
+:::
+
+::: fragment
+- $Post_B$:
+With 100 coin tosses, the likelihood dominates, so the posterior shifts more towards the data.
+:::
+
+:::
+:::
+
 ::: incremental
-- $Post_A \propto p^2 (1-p)^1 \times p^{50} (1-p)^{50}$
-
-  - $Post_A \propto p^{52} (1-p)^{51}$
-
-  - $Post_A' = 52p^{51}(1-p)^{51}-$ \n $51p^{52}(1-p)^{50}$
-
-  -  p = 52/103 = 0.5048
-
-- $Post_B \propto p^{60} (1-p)^{40} \times p^{50} (1-p)^{50}$
-
-  - $Post_B \propto p^{110} (1-p)^{90}$
-
-  - p = 110/200 = 0.55
+- We usually have some sense of a scale about parameters, we can legally use that information.
+- The same prior can have a strong or weak influence depending on how much data we have.
 :::
-:::
-::: {.column width=50%}
-::: incremental
-- $Like_B$: 60 heads out of 100 tosses
-- $Prior_B$: P(H) is about 50%, a reasonable assumption based on existing knowledge of coins
-- $Post_B$: P(H) is likely between 50% and 60% (55% in this example)
--  We usually have some sense of a scale about parameters, we can legally use that information
-:::
-:::
-:::
+
+---
+
 
 ## Priors and ecology (simple linear model; *y* = *ax* + *b*)
 
