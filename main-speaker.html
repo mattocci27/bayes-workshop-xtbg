@@ -867,54 +867,36 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 <li class="fragment">The same prior can have a strong or weak influence depending on how much data we have.</li>
 </ul>
 </section>
-<section id="priors-and-ecology-simple-linear-model-y-ax-b" class="slide level2">
-<h2>Priors and ecology (simple linear model; <em>y</em> = <em>ax</em> + <em>b</em>)</h2>
+<section id="priors-in-ecology-why-scale-matters" class="slide level2">
+<h2>Priors in ecology: Why scale matters</h2>
 <ul>
-<li class="fragment">Considering variables <em>x</em> = {-3, …, 3} and <em>y</em> = {-6, …, 4}. At this point, we don’t know if there is a correlation between <em>x</em> and <em>y</em>.</li>
-<li class="fragment">However, given the similar scales of <em>x</em> and <em>y</em>, it’s reasonable to guess that <em>a</em> falls within a narrow range (-1000 &lt; <em>a</em> &lt; 1000 or -5 &lt; <em>a</em> &lt; 5 ?).</li>
-<li class="fragment">For example, <em>y</em> = 100 <em>x</em> + 2 doesn’t work (blue line).</li>
-</ul>
-<div class="fragment">
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="figure/unnamed-chunk-19-1.png" class="quarto-figure quarto-figure-center" width="480"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="priors-and-ecology-simple-linear-model-y-ax-b-1" class="slide level2">
-<h2>Priors and ecology (simple linear model; <em>y</em> = <em>ax</em> + <em>b</em>)</h2>
-<ul>
-<li>Considering variables <em>x</em> = {-3, …, 3} and <em>y</em> = {-6, …, 4}. At this point, we don’t know if there is a correlation between <em>x</em> and <em>y</em>.</li>
-<li>However, given the similar scales of <em>x</em> and <em>y</em>, it’s reasonable to guess that <em>a</em> falls within a narrow range (-1000 &lt; <em>a</em> &lt; 1000 or -5 &lt; <em>a</em> &lt; 5 ?).</li>
+<li class="fragment">We consider variables <em>x</em> = {-3, …, 3} and <em>y</em> = {-6, …, 4}. We don’t yet know if there is a correlation (<em>y = ax + b</em>).</li>
+<li class="fragment">However, given the similar scales of <em>x</em> and <em>y</em>, it’s reasonable to guess that <em>a</em> falls within a narrow range (e.g., -5 to 5).</li>
+<li class="fragment">In contrast, a slope like <em>a</em> = 100 (blue line) clearly doesn’t match the data.</li>
 </ul>
 
-<img data-src="figure/unnamed-chunk-20-1.png" class="quarto-figure quarto-figure-center r-stretch" width="1728"></section>
-<section id="priors-and-ecology-multilevel-model-group-level-differences" class="slide level2">
-<h2>Priors and ecology (multilevel model: group-level differences)</h2>
+<img data-src="figure/unnamed-chunk-19-1.png" class="quarto-figure quarto-figure-center r-stretch" width="480"></section>
+<section id="priors-and-ecology-multilevel-structure-for-group-level-effects" class="slide level2">
+<h2>Priors and ecology: multilevel structure for group-level effects</h2>
 <div class="columns">
 <div class="column" style="width:40%;">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-21-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-20-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>
 </div>
+<div class="footer">
+<p><em>i</em> indexes samples (e.g., individuals), and <em>j</em> indexes groups (e.g., species or sites).</p>
+</div>
 </div><div class="column" style="width:60%;">
 <ul>
-<li class="fragment"><span class="math inline">\(y_i = ax_i + b_j\)</span>
-<ul>
-<li class="fragment">If the parameter <span class="math inline">\(b_j\)</span> is similar within each group (e.g., species differences, site differences):</li>
 <li class="fragment">Likelihood: <span class="math inline">\(y_i \sim \mathcal{N}(ax_i + b_j, \sigma)\)</span></li>
+<li class="fragment">If the parameter <span class="math inline">\(b_j\)</span> is similar within each group (e.g., species differences, site differences), it makes sense to model:</li>
 <li class="fragment">Prior: <span class="math inline">\(b_j \sim \mathcal{N}(\mu_b, \tau)\)</span></li>
-</ul></li>
 </ul>
 </div></div>
 </section>
@@ -925,7 +907,7 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 <p><img data-src="images/spatial.png"></p>
 </div><div class="column" style="width:70%;">
 <ul>
-<li>If the data <span class="math inline">\(y_i\)</span> is similar to the surrounding samples (e.g., spatial autocorrelation):</li>
+<li>When the data <span class="math inline">\(y_i\)</span> is similar to the surrounding samples (e.g., spatial autocorrelation):</li>
 </ul>
 <ul>
 <li class="fragment">Likelihood: <span class="math inline">\(y_i \sim \mathcal{N}(\mu + \tilde{r_i}, \sigma)\)</span></li>
@@ -1234,7 +1216,7 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-27-1.png" class="quarto-figure quarto-figure-center" width="672"></p>
+<p><img data-src="figure/unnamed-chunk-26-1.png" class="quarto-figure quarto-figure-center" width="672"></p>
 </figure>
 </div>
 </div>
@@ -1315,7 +1297,7 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-28-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-27-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1326,7 +1308,7 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-29-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-28-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1497,7 +1479,7 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-32-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-31-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>
