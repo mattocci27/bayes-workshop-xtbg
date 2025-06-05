@@ -615,18 +615,18 @@
 </div>
 </section></section>
 <section>
-<section id="conditional-probability-and-bayess-theorem" class="title-slide slide level1 center">
-<h1>Conditional Probability and Bayes’s Theorem</h1>
+<section id="conditional-probability-and-bayes-theorem" class="title-slide slide level1 center">
+<h1>Conditional Probability and Bayes’ Theorem</h1>
 
 </section>
-<section id="conditional-probability-and-bayess-theorem-1" class="slide level2">
-<h2>Conditional Probability and Bayes’s Theorem</h2>
+<section id="conditional-probability-and-bayes-theorem-1" class="slide level2">
+<h2>Conditional Probability and Bayes’ Theorem</h2>
 <p><span class="math display">\[
 P(A \mid B) = \frac{P(B \mid A) \times P(A)}{P(B)}
 \]</span></p>
 <ul>
 <li><p>Conditional probability</p></li>
-<li><p>Bayes’s Theorem</p></li>
+<li><p>Bayes’ Theorem</p></li>
 <li><p>Forward / inverse problems</p></li>
 <li><p>Revisiting Bayes</p></li>
 </ul>
@@ -697,8 +697,8 @@ P(A \mid B) = \frac{P(A \cap B)}{P(B)}
           display:block!important;
       }</style></aside>
 </section>
-<section id="bayess-theorem" class="slide level2">
-<h2>Bayes’s Theorem</h2>
+<section id="bayes-theorem" class="slide level2">
+<h2>Bayes’ Theorem</h2>
 <p><span class="math display">\[
 P(B \mid A) = \frac{P(A \cap B)}{P(A)}
 \]</span></p>
@@ -741,75 +741,61 @@ P(A \mid B) = \frac{P(B \mid A) \times P(A)}{P(B)}
 
 
 <img src="images/fip_6.png" width="100%" style="display: block; margin: auto;" class="r-stretch"></section>
-<section id="forward-and-inverse-problems" class="slide level2">
-<h2>Forward and Inverse Problems</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
+<section id="forward-and-inverse-problems-pcr-and-disease-example" class="slide level2">
+<h2>Forward and Inverse Problems: PCR and disease example</h2>
+<div class="footer">
 <ul>
-<li class="fragment"><p>X: 3 red balls, 5 white balls</p></li>
-<li class="fragment"><p>Y: 1 red balls, 3 white balls</p></li>
-<li class="fragment"><p>Randomly choose a bag X or Y</p></li>
-<li class="fragment"><p><span class="math inline">\(P(A)\)</span>: <span class="blue">Choosing X</span></p></li>
-<li class="fragment"><p><span class="math inline">\(P(B)\)</span>: <span class="blue">Drawing a red ball</span></p></li>
-<li class="fragment"><p><span class="math inline">\(P(B \mid A)\)</span>: <span class="blue">Getting a red ball from X</span></p></li>
-<li class="fragment"><p><span class="math inline">\(P(A \cap B)\)</span>: <span class="blue">Choosing X and drawing a red ball</span></p></li>
-<li class="fragment"><p><span class="math inline">\(P(A \mid B)\)</span>: <span class="orange">Picked X, because you got a red ball(?)</span></p></li>
+<li><span class="math inline">\(P(\text{Positive})\)</span>: 2%, <span class="math inline">\(P(\text{Infected})\)</span>: 0.05%</li>
 </ul>
-</div><div class="column" style="width:50%;">
+</div>
+<p><strong>➡️Forward problem:</strong> If you are infected, what is the probability that PCR test is positive?</p>
+<div class="fragment">
 <ul>
-<li class="fragment"><p><span class="math inline">\(P(A) = 1/2\)</span></p></li>
-<li class="fragment"><p><span class="math inline">\(P(B \mid A) = 3/8\)</span></p></li>
-<li class="fragment"><p><span class="math inline">\(P(B)\)</span> = 1/2 <span class="math inline">\(\times\)</span> 3/8 + 1/2 <span class="math inline">\(\times\)</span> 1/4 = 5 /16</p></li>
-<li class="fragment"><p><span class="math inline">\(P(A \cap B)\)</span> = 1/2 <span class="math inline">\(\times\)</span> 3/8 = 3/16</p></li>
-<li class="fragment"><p><span class="math inline">\(P(A \mid B)\)</span> = <span class="math inline">\(P(A \cap B) / P(B)\)</span> = (3/16) / (5/16) = 3/5</p></li>
+<li><span class="math inline">\(P(\text{Positive} \mid \text{Infected})\)</span>: 95%</li>
 </ul>
-</div></div>
-<aside class="notes">
+</div>
+<div class="fragment">
+<p>This is what the lab test is designed to estimate — how likely we are to observe a positive signal given the known infection status (e.g., 95 out of 100 infected samples test positive).</p>
+</div>
+<div class="fragment">
+<p><br> <strong>🔁Inverse problem (Bayesian):</strong> If the PCR test is positive, what is the probability that you are infected?</p>
+</div>
+<div class="fragment">
 <ul>
-<li><p>Best example seems to be bags and balls</p></li>
-<li><p>When you got a red ball, which bag did you choose?</p></li>
+<li><span class="math inline">\(P(\text{Infected} \mid \text{Positive}) = \frac{P(\text{Positive} \mid \text{Infected}) \cdot  P(\text{Infected})}{P(\text{Positive})} \approx 2.4\%\)</span></li>
 </ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
+</div>
+<div class="fragment">
+<p>This isn’t intuitive, but it’s the probability we actually care about — how likely someone is to be infected, given a positive test result.</p>
+</div>
 </section>
 <section class="slide level2">
 
 
 <img src="images/bayes_re.png" width="100%" style="display: block; margin: auto;" class="r-stretch"></section>
-<section class="slide level2">
-
+<section id="bayes-theorem-1" class="slide level2">
+<h2>Bayes’ theorem</h2>
 <p><span class="math display">\[
 P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Parameter}) \times P(\mathrm{Parameter})}{P(\mathrm{Data})}
 \]</span></p>
-<div class="small">
 <ul>
 <li class="fragment"><p><span class="math inline">\(P(\mathrm{Parameter} \mid \mathrm{Data})\)</span></p>
 <ul>
-<li class="fragment">When you got your data, what were the parameters behind the data (e.g., coefficients of regressions)?</li>
+<li class="fragment"><strong>What we want to estimate (posterior)</strong>: When we got our data, what were the parameters behind the data (e.g., coefficients of regressions)?</li>
 </ul></li>
 <li class="fragment"><p><span class="math inline">\(P(\mathrm{Data} \mid \mathrm{Parameter})\)</span></p>
 <ul>
-<li class="fragment">When you know your parameters, what is the probability of getting your data? (i.e., <strong>likelihood</strong>)</li>
+<li class="fragment">When we know our parameters, what is the probability of getting our data? (i.e., <strong>likelihood</strong>)</li>
 </ul></li>
 <li class="fragment"><p><span class="math inline">\(P(\mathrm{Parameter})\)</span></p>
 <ul>
-<li class="fragment">Probability to get your parameters. This is what you assume for your parameter before you see any data (i.e., <strong>prior</strong>).</li>
+<li class="fragment">Probability to get our parameters. This is what we assume for our parameter before we see any data (i.e., <strong>prior??</strong> — next section).</li>
 </ul></li>
 <li class="fragment"><p><span class="math inline">\(P(\mathrm{Data})\)</span></p>
 <ul>
 <li class="fragment">Independent with parameters (i.e., constant)</li>
 </ul></li>
 </ul>
-</div>
 </section>
 <section class="slide level2">
 

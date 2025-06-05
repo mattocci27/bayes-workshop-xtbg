@@ -570,9 +570,9 @@ I won't explain this now — but this is the kind of model we'll build after lea
 
 :::
 
-# Conditional Probability and Bayes's Theorem
+# Conditional Probability and Bayes' Theorem
 
-## Conditional Probability and Bayes's Theorem
+## Conditional Probability and Bayes' Theorem
 
 $$
 P(A \mid B) = \frac{P(B \mid A) \times P(A)}{P(B)}
@@ -580,7 +580,7 @@ $$
 
 - Conditional probability
 
-- Bayes's Theorem
+- Bayes' Theorem
 
 - Forward / inverse problems
 
@@ -718,7 +718,7 @@ e.g.,
 
 ---
 
-##  Bayes's Theorem
+##  Bayes' Theorem
 
 $$
 P(B \mid A) = \frac{P(A \cap B)}{P(A)}
@@ -769,7 +769,7 @@ $$
 
 ---
 
-## Forward and Inverse Problems
+<!-- ## Forward and Inverse Problems
 
 
 ::: columns
@@ -813,7 +813,41 @@ $$
 - Best example seems to be bags and balls
 
 - When you got a red ball, which bag did you choose?
+::: -->
+
+## Forward and Inverse Problems: PCR and disease example
+
+::: footer
+- $P(\text{Positive})$: 2%, $P(\text{Infected})$: 0.05%
 :::
+
+**➡️Forward problem:**
+If you are infected, what is the probability that PCR test is positive?
+
+::: fragment
+- $P(\text{Positive} \mid \text{Infected})$: 95%
+:::
+
+::: fragment
+This is what the lab test is designed to estimate — how likely we are to observe a positive signal given the known infection status (e.g., 95 out of 100 infected samples test positive).
+:::
+
+
+::: fragment
+<br>
+**🔁Inverse problem (Bayesian):**
+If the PCR test is positive, what is the probability that you are infected?
+:::
+
+::: fragment
+- $P(\text{Infected} \mid \text{Positive}) = \frac{P(\text{Positive} \mid \text{Infected}) \cdot  P(\text{Infected})}{P(\text{Positive})} \approx 2.4\%$
+:::
+
+::: fragment
+This isn’t intuitive, but it’s the probability we actually care about — how likely someone is to be infected, given a positive test result.
+
+:::
+
 
 ---
 
@@ -821,29 +855,31 @@ $$
 
 ---
 
+## Bayes' theorem
+
 $$
 P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Parameter}) \times P(\mathrm{Parameter})}{P(\mathrm{Data})}
 $$
 
-::: small
+<!-- ::: small -->
 ::: incremental
 - $P(\mathrm{Parameter} \mid \mathrm{Data})$
 
-  - When you got your data, what were the parameters behind the data (e.g., coefficients of regressions)?
+  - **What we want to estimate (posterior)**: When we got our data, what were the parameters behind the data (e.g., coefficients of regressions)?
 
 - $P(\mathrm{Data} \mid \mathrm{Parameter})$
 
-  - When you know your parameters, what is the probability of getting your data? (i.e., **likelihood**)
+  - When we know our parameters, what is the probability of getting our data? (i.e., **likelihood**)
 
 - $P(\mathrm{Parameter})$
 
-  - Probability to get your parameters. This is what you assume for your parameter before you see any data (i.e., **prior**).
+  - Probability to get our parameters. This is what we assume for our parameter before we see any data (i.e., **prior??** — next section).
 
 - $P(\mathrm{Data})$
 
   - Independent with parameters (i.e., constant)
 :::
-:::
+<!-- ::: -->
 
 ---
 
