@@ -953,6 +953,34 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 </div></div>
 </section></section>
 <section>
+<section id="tools-for-bayesian-modeling" class="title-slide slide level1 center">
+<h1>Tools for Bayesian Modeling</h1>
+
+</section>
+<section id="tools-for-bayesian-modeling-1" class="slide level2">
+<h2>Tools for Bayesian Modeling</h2>
+
+<img data-src="figure/unnamed-chunk-21-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"><ul>
+<li>Basic idea of MCMC</li>
+<li>Stan: A modern language for Bayesian modeling</li>
+<li>Interefaces to Stan</li>
+<li>Other tools for Bayesian modeling</li>
+</ul>
+</section>
+<section id="mcmc-markov-chain-monte-carlo" class="slide level2">
+<h2>MCMC (Markov Chain Monte Carlo)</h2>
+<p>Goal: Aproximate the posterior distribution of parameters given the data instead of calculating it directly.</p>
+<p>For simple models, we can fith parameters that maximize the posterior distribution.</p>
+<p>Coin A example again: <span class="math display">\[
+\textcolor{#1b9e77}{\text{Posterior}} \propto
+\textcolor{#d95f02}{p^{50}(1 - p)^{50}} \times
+\textcolor{#7570b3}{p^2(1 - p)^1}
+\]</span></p>
+<div class="fragment">
+<p>Coin A example again: <span class="math inline">\(Post_A \propto p^2 (1-p)^1 \times p^{50} (1-p)^{50}\)</span> <span class="math inline">\(p = 52/103 \approx 0.505\)</span></p>
+</div>
+</section></section>
+<section>
 <section id="multilevel-model" class="title-slide slide level1 center">
 <h1>Multilevel model</h1>
 
@@ -1252,7 +1280,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-26-1.png" class="quarto-figure quarto-figure-center" width="672"></p>
+<p><img data-src="figure/unnamed-chunk-27-1.png" class="quarto-figure quarto-figure-center" width="672"></p>
 </figure>
 </div>
 </div>
@@ -1333,7 +1361,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-27-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-28-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1344,7 +1372,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-28-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-29-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1515,7 +1543,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-31-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-32-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>

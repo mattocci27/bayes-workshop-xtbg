@@ -1109,7 +1109,6 @@ Each observation *i* is associated with a grid cell ($m,n$), so $\tilde{r}i = r_
 :::
 
 ::: fragment
-
 $$
 \begin{align*}
 \phi_{m,n} = \frac{1}{8} (&
@@ -1118,12 +1117,61 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 & r_{m+1,n-1} + r_{m+1,n} + r_{m+1,n+1})
 \end{align*}
 $$
-
-
+:::
+:::
 :::
 
-:::
 
+# Tools for Bayesian Modeling
+
+## Tools for Bayesian Modeling
+
+```{r}
+# Load necessary packages
+library(bayesplot)
+library(posterior)  # for creating a draws_array
+
+# Simulate MCMC draws for 3 chains and 1000 iterations
+set.seed(42)
+n_iter <- 1000
+n_chains <- 3
+param <- replicate(n_chains, cumsum(rnorm(n_iter, 0, 0.1)) + 0)
+
+# Combine into a 3D array: iterations × chains × parameters
+draws_array <- array(param,
+  dim = c(n_iter, n_chains, 1),
+  dimnames = list(NULL, NULL, "beta[1]"))
+
+# Traceplot using bayesplot
+color_scheme_set("viridis")
+mcmc_trace(draws_array, n_warmup = 0, facet_args = list(nrow = 3)) +
+  labs(x = "Iteration")
+```
+
+- Basic idea of MCMC
+- Stan: A modern language for Bayesian modeling
+- Interefaces to Stan
+- Other tools for Bayesian modeling
+
+## MCMC (Markov Chain Monte Carlo)
+
+Goal: Aproximate the posterior distribution of parameters given the data instead of calculating it directly.
+
+For simple models, we can find parameters that maximize the posterior distribution.
+
+
+Coin A example again:
+$$
+\textcolor{#1b9e77}{\text{Posterior}} \propto
+\textcolor{#d95f02}{p^{50}(1 - p)^{50}} \times
+\textcolor{#7570b3}{p^2(1 - p)^1}
+$$
+
+
+::: fragment
+Coin A example again:
+$Post_A \propto p^2 (1-p)^1 \times p^{50} (1-p)^{50}$
+$p = 52/103 \approx 0.505$
 :::
 
 # Multilevel model
