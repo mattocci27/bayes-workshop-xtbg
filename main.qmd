@@ -728,15 +728,20 @@ $$
 P(A \mid B) = \frac{P(A \cap B)}{P(B)}
 $$
 
+
+::: fragment
 $$
 P(A \mid B) \times P(B) =  P(B \mid A) \times P(A)
 $$
+:::
 
 
+::: fragment
 ::: box
 $$
 P(A \mid B) = \frac{P(B \mid A) \times P(A)}{P(B)}
 $$
+:::
 :::
 
 ::: fragment
@@ -998,14 +1003,14 @@ With 100 coin tosses, the likelihood dominates, so the posterior shifts more tow
 
 ---
 
-
 ## Priors in ecology: Why scale matters
 
-::: incremental
-- We consider variables *x* = {-3, ..., 3} and *y* = {-6, ..., 4}. We don't yet know if there is a correlation (*y = ax + b*).
-- However, given the similar scales of *x* and *y*, it's reasonable to guess that *a* falls within a narrow range (e.g., **strongly informative prior**: -5 to 5, **weakly informative prior**: $a \sim \mathcal{N}(0,  2.5)$).
-- In contrast, a slope like *a* = 100 (blue line) clearly doesn't match the data (i.e., **uninformative prior**: $a \sim \mathcal{N}(0,  10^4)$).
+::: footer
+We often use weakly informative priors in ecology.
 :::
+
+::: columns
+::: {.column width=40%}
 
 ```{r, fig.height=5, fig.width=5}
 set.seed(123)
@@ -1015,13 +1020,35 @@ p1 <- tibble(x1, y1) |>
   ggplot() +
   xlab("x") +
   ylab("y") +
+  ggtitle("y= ax + b") +
   geom_point(aes(x1, y1), size = 5) +
-  geom_abline(intercept = 2, slope = 1000, col = "blue", size = 2) +
+  geom_abline(intercept = 2, slope = 1000, col = "blue", size = 2, lty = 2) +
+  annotate(
+    "text",
+    x     = 1,
+    y     = -4,
+    label = "y = 100x + 2",
+    color = "blue",
+    size  = 10
+  ) +
   theme(
     axis.title   = element_text(size = 32),
     axis.text    = element_text(size = 28))
 p1
 ```
+:::
+
+::: {.column width=60%}
+
+::: incremental
+- We consider variables *x* = {-3, ..., 3} and *y* = {-6, ..., 4}. We don't yet know if there is a correlation (*y = ax + b*).
+- However, given the similar scales of *x* and *y*, it's reasonable to guess that *a* falls within a narrow range (e.g., **strongly informative prior**: -5 to 5, **weakly informative prior**: $a \sim \mathcal{N}(0,  2.5)$).
+- In contrast, a slope like *a* = 100 (blue line) clearly doesn't match the data (i.e., **uninformative prior**: $a \sim \mathcal{N}(0,  10^4)$).
+:::
+
+:::
+:::
+
 
 ## Priors and ecology: multilevel structure for group-level effects
 
@@ -1054,6 +1081,8 @@ tibble(y = unlist(y), x = rep(x, n_sp), .id = rep(letters[1:n_sp], each = 100)) 
 - Likelihood: $y_i \sim \mathcal{N}(ax_i + b_j, \sigma)$
 - If the parameter $b_j$ is similar within each group (e.g., species differences, site differences), it makes sense to model:
 - Prior: $b_j \sim \mathcal{N}(\mu_b, \tau)$
+  - $\mu_b$: global means across all groups
+  - $\tau$: variation among groups
 :::
 :::
 :::

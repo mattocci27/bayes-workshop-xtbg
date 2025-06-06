@@ -705,13 +705,17 @@ P(B \mid A) = \frac{P(A \cap B)}{P(A)}
 <p><span class="math display">\[
 P(A \mid B) = \frac{P(A \cap B)}{P(B)}
 \]</span></p>
+<div class="fragment">
 <p><span class="math display">\[
 P(A \mid B) \times P(B) =  P(B \mid A) \times P(A)
 \]</span></p>
+</div>
+<div class="fragment">
 <div class="box">
 <p><span class="math display">\[
 P(A \mid B) = \frac{P(B \mid A) \times P(A)}{P(B)}
 \]</span></p>
+</div>
 </div>
 <div class="fragment">
 <h3 id="why-is-this-useful">Why is this useful?</h3>
@@ -869,13 +873,28 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 </section>
 <section id="priors-in-ecology-why-scale-matters" class="slide level2">
 <h2>Priors in ecology: Why scale matters</h2>
+<div class="footer">
+<p>We often use weakly informative priors in ecology.</p>
+</div>
+<div class="columns">
+<div class="column" style="width:40%;">
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="figure/unnamed-chunk-19-1.png" class="quarto-figure quarto-figure-center" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:60%;">
 <ul>
 <li class="fragment">We consider variables <em>x</em> = {-3, …, 3} and <em>y</em> = {-6, …, 4}. We don’t yet know if there is a correlation (<em>y = ax + b</em>).</li>
 <li class="fragment">However, given the similar scales of <em>x</em> and <em>y</em>, it’s reasonable to guess that <em>a</em> falls within a narrow range (e.g., <strong>strongly informative prior</strong>: -5 to 5, <strong>weakly informative prior</strong>: <span class="math inline">\(a \sim \mathcal{N}(0,  2.5)\)</span>).</li>
 <li class="fragment">In contrast, a slope like <em>a</em> = 100 (blue line) clearly doesn’t match the data (i.e., <strong>uninformative prior</strong>: <span class="math inline">\(a \sim \mathcal{N}(0,  10^4)\)</span>).</li>
 </ul>
-
-<img data-src="figure/unnamed-chunk-19-1.png" class="quarto-figure quarto-figure-center r-stretch" width="480"></section>
+</div></div>
+</section>
 <section id="priors-and-ecology-multilevel-structure-for-group-level-effects" class="slide level2">
 <h2>Priors and ecology: multilevel structure for group-level effects</h2>
 <div class="columns">
@@ -896,7 +915,11 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 <ul>
 <li class="fragment">Likelihood: <span class="math inline">\(y_i \sim \mathcal{N}(ax_i + b_j, \sigma)\)</span></li>
 <li class="fragment">If the parameter <span class="math inline">\(b_j\)</span> is similar within each group (e.g., species differences, site differences), it makes sense to model:</li>
-<li class="fragment">Prior: <span class="math inline">\(b_j \sim \mathcal{N}(\mu_b, \tau)\)</span></li>
+<li class="fragment">Prior: <span class="math inline">\(b_j \sim \mathcal{N}(\mu_b, \tau)\)</span>
+<ul>
+<li class="fragment"><span class="math inline">\(\mu_b\)</span>: global means across all groups</li>
+<li class="fragment"><span class="math inline">\(\tau\)</span>: variation among groups</li>
+</ul></li>
 </ul>
 </div></div>
 </section>
