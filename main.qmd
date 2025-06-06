@@ -918,8 +918,8 @@ We compare two coins, A and B, with the same prior but different likelihood (due
 
 ### MLE
 
-- A: 2 head out of 3 tosses -> 2/3 = 0.666
-- B: 60 heads out of 100 tosses -> 60/100 = 0.6
+- A: 2 head out of 3 tosses -> P(H) = 2/3 = 0.666
+- B: 60 heads out of 100 tosses -> P(H) = 60/100 = 0.6
 
 ::: fragment
 ::: columns
@@ -992,8 +992,8 @@ With 100 coin tosses, the likelihood dominates, so the posterior shifts more tow
 :::
 
 ::: incremental
-- We usually have some sense of a scale about parameters, we can legally use that information.
 - The same prior can have a strong or weak influence depending on how much data we have.
+- We usually have some sense of a scale about parameters, we can legally use that information.
 :::
 
 ---
@@ -1003,8 +1003,8 @@ With 100 coin tosses, the likelihood dominates, so the posterior shifts more tow
 
 ::: incremental
 - We consider variables *x* = {-3, ..., 3} and *y* = {-6, ..., 4}. We don't yet know if there is a correlation (*y = ax + b*).
-- However, given the similar scales of *x* and *y*, it's reasonable to guess that *a* falls within a narrow range (e.g., -5 to 5).
-- In contrast, a slope like *a* = 100 (blue line) clearly doesn't match the data.
+- However, given the similar scales of *x* and *y*, it's reasonable to guess that *a* falls within a narrow range (e.g., **strongly informative prior**: -5 to 5, **weakly informative prior**: $a \sim \mathcal{N}(0,  2.5)$).
+- In contrast, a slope like *a* = 100 (blue line) clearly doesn't match the data (i.e., **uninformative prior**: $a \sim \mathcal{N}(0,  10^4)$).
 :::
 
 ```{r, fig.height=5, fig.width=5}
@@ -1058,7 +1058,11 @@ tibble(y = unlist(y), x = rep(x, n_sp), .id = rep(letters[1:n_sp], each = 100)) 
 :::
 :::
 
-## Priors and ecology (multilevel model: autocorealtion)
+## Priors and ecology: multilevel structure for spatial autocorrelation
+
+::: footer
+Each observation *i* is associated with a grid cell ($m,n$), so $\tilde{r}i = r_{m,n}$.
+:::
 
 ::: columns
 ::: {.column width="30%"}
@@ -1067,14 +1071,30 @@ tibble(y = unlist(y), x = rep(x, n_sp), .id = rep(letters[1:n_sp], each = 100)) 
 
 ::: {.column width="70%"}
 
-- When the data $y_i$ is similar to the surrounding samples (e.g., spatial autocorrelation):
+- When the data $y_i$ is similar to the surrounding samples (e.g., temporal / spatial autocorrelation):
 
 ::: incremental
   - Likelihood: $y_i \sim \mathcal{N}(\mu + \tilde{r_i}, \sigma)$
-  - Prior: $\tilde{r_i} = r_{m, n} \sim \mathcal{N}(\phi_{m,n}, \tau)$
-  - $\phi_{m,n} = (r_{m-1, n-1} + r_{m, n-1} + r_{m+1, n-1} +$ \n $r_{m-1, n} + r_{m+1, n} +$ \n  $r_{m+1, n-1} + r_{m+1, n} + r_{m+1, n+1})/8$
+  - Prior (spatial effect): $\tilde{r_i} = r_{m, n} \sim \mathcal{N}(\phi_{m,n}, \tau)$
+  - $\phi_{m,n}$ = average of 8 neighbors around  $r_{m,n}$
 :::
+
+::: fragment
+
+$$
+\begin{align*}
+\phi_{m,n} = \frac{1}{8} (&
+r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
+& r_{m,n-1} + r_{m,n+1} + \\
+& r_{m+1,n-1} + r_{m+1,n} + r_{m+1,n+1})
+\end{align*}
+$$
+
+
 :::
+
+:::
+
 :::
 
 # Multilevel model

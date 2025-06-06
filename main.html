@@ -811,8 +811,8 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 <p>We compare two coins, A and B, with the same prior but different likelihood (due to data sizes) to illustrate how prior beliefs influence posterior estimates.</p>
 <h3 id="mle">MLE</h3>
 <ul>
-<li>A: 2 head out of 3 tosses -&gt; 2/3 = 0.666</li>
-<li>B: 60 heads out of 100 tosses -&gt; 60/100 = 0.6</li>
+<li>A: 2 head out of 3 tosses -&gt; P(H) = 2/3 = 0.666</li>
+<li>B: 60 heads out of 100 tosses -&gt; P(H) = 60/100 = 0.6</li>
 </ul>
 <div class="fragment">
 <div class="columns">
@@ -863,16 +863,16 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 </div>
 </div></div>
 <ul>
-<li class="fragment">We usually have some sense of a scale about parameters, we can legally use that information.</li>
 <li class="fragment">The same prior can have a strong or weak influence depending on how much data we have.</li>
+<li class="fragment">We usually have some sense of a scale about parameters, we can legally use that information.</li>
 </ul>
 </section>
 <section id="priors-in-ecology-why-scale-matters" class="slide level2">
 <h2>Priors in ecology: Why scale matters</h2>
 <ul>
 <li class="fragment">We consider variables <em>x</em> = {-3, …, 3} and <em>y</em> = {-6, …, 4}. We don’t yet know if there is a correlation (<em>y = ax + b</em>).</li>
-<li class="fragment">However, given the similar scales of <em>x</em> and <em>y</em>, it’s reasonable to guess that <em>a</em> falls within a narrow range (e.g., -5 to 5).</li>
-<li class="fragment">In contrast, a slope like <em>a</em> = 100 (blue line) clearly doesn’t match the data.</li>
+<li class="fragment">However, given the similar scales of <em>x</em> and <em>y</em>, it’s reasonable to guess that <em>a</em> falls within a narrow range (e.g., <strong>strongly informative prior</strong>: -5 to 5, <strong>weakly informative prior</strong>: <span class="math inline">\(a \sim \mathcal{N}(0,  2.5)\)</span>).</li>
+<li class="fragment">In contrast, a slope like <em>a</em> = 100 (blue line) clearly doesn’t match the data (i.e., <strong>uninformative prior</strong>: <span class="math inline">\(a \sim \mathcal{N}(0,  10^4)\)</span>).</li>
 </ul>
 
 <img data-src="figure/unnamed-chunk-19-1.png" class="quarto-figure quarto-figure-center r-stretch" width="480"></section>
@@ -890,7 +890,7 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 </div>
 </div>
 <div class="footer">
-<p><em>i</em> indexes samples (e.g., individuals), and <em>j</em> indexes groups (e.g., species or sites).</p>
+<p><em>i</em> indexes samples (e.g., individuals), and <em>j</em> indexes groups (e.g., species, sites).</p>
 </div>
 </div><div class="column" style="width:60%;">
 <ul>
@@ -900,20 +900,33 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 </ul>
 </div></div>
 </section>
-<section id="priors-and-ecology-multilevel-model-autocorealtion" class="slide level2">
-<h2>Priors and ecology (multilevel model: autocorealtion)</h2>
+<section id="priors-and-ecology-multilevel-structure-for-spatial-autocorrelation" class="slide level2">
+<h2>Priors and ecology: multilevel structure for spatial autocorrelation</h2>
+<div class="footer">
+<p>Each observation <em>i</em> is associated with a grid cell (<span class="math inline">\(m,n\)</span>), so <span class="math inline">\(\tilde{r}i = r_{m,n}\)</span>.</p>
+</div>
 <div class="columns">
 <div class="column" style="width:30%;">
 <p><img data-src="images/spatial.png"></p>
 </div><div class="column" style="width:70%;">
 <ul>
-<li>When the data <span class="math inline">\(y_i\)</span> is similar to the surrounding samples (e.g., spatial autocorrelation):</li>
+<li>When the data <span class="math inline">\(y_i\)</span> is similar to the surrounding samples (e.g., temporal / spatial autocorrelation):</li>
 </ul>
 <ul>
 <li class="fragment">Likelihood: <span class="math inline">\(y_i \sim \mathcal{N}(\mu + \tilde{r_i}, \sigma)\)</span></li>
-<li class="fragment">Prior: <span class="math inline">\(\tilde{r_i} = r_{m, n} \sim \mathcal{N}(\phi_{m,n}, \tau)\)</span></li>
-<li class="fragment"><span class="math inline">\(\phi_{m,n} = (r_{m-1, n-1} + r_{m, n-1} + r_{m+1, n-1} +\)</span> <span class="math inline">\(r_{m-1, n} + r_{m+1, n} +\)</span> <span class="math inline">\(r_{m+1, n-1} + r_{m+1, n} + r_{m+1, n+1})/8\)</span></li>
+<li class="fragment">Prior (spatial effect): <span class="math inline">\(\tilde{r_i} = r_{m, n} \sim \mathcal{N}(\phi_{m,n}, \tau)\)</span></li>
+<li class="fragment"><span class="math inline">\(\phi_{m,n}\)</span> = average of 8 neighbors around <span class="math inline">\(r_{m,n}\)</span></li>
 </ul>
+<div class="fragment">
+<p><span class="math display">\[
+\begin{align*}
+\phi_{m,n} = \frac{1}{8} (&amp;
+r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
+&amp; r_{m,n-1} + r_{m,n+1} + \\
+&amp; r_{m+1,n-1} + r_{m+1,n} + r_{m+1,n+1})
+\end{align*}
+\]</span></p>
+</div>
 </div></div>
 </section></section>
 <section>
