@@ -1172,9 +1172,9 @@ mcmc_trace(draws_array, n_warmup = 0, facet_args = list(nrow = 3)) +
 ::: fragment
 For simple models, we can analytically find parameters that maximize the posterior distribution.
 
-Coin A example again:
-$\textcolor{#d95f02}{Post_A}\propto\textcolor{#1b9e77}{p^2 (1-p)^1} \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}$
-$p = 52/103 \approx 0.505$
+Coin B example again:
+$\textcolor{#d95f02}{Post_B}\propto\textcolor{#1b9e77}{p^{60} (1-p)^{40}} \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}$
+$p = 110/200 = 0.55$
 :::
 
 ## MCMC: simple example
@@ -1185,8 +1185,8 @@ $p = 52/103 \approx 0.505$
 ```{r mcmc-simple}
 # your log‐like and MCMC from above
 like_p <- function(p) {
-  if (p <= 0 || p >= 1) return(-Inf)
-  52*log(p) + 51*log(1-p)
+  # if (p <= 0 || p >= 1) return(-Inf)
+  110*log(p) + 90*log(1-p)
 }
 mcmc_simple <- function(n_iter = 100, init_p = 0.2) {
   samples  <- numeric(n_iter)
@@ -1214,7 +1214,8 @@ df <- tibble(
   iteration = 1:n_iter,
   `chain 1`  = chain1,
   `chain 2`  = chain2) |>
-  pivot_longer(-iteration, names_to = "chain", values_to = "p")
+  pivot_longer(-iteration, names_to = "chain", values_to = "p") |>
+  mutate(post = like_p(p))
 
 # animated trace
 p1 <- ggplot(df, aes(x = iteration, y = p, color = chain)) +
@@ -1227,20 +1228,38 @@ p1 <- ggplot(df, aes(x = iteration, y = p, color = chain)) +
   ) +
   theme_minimal(base_size = 24) +
   theme(
-  #   plot.title      = element_text(size = 26, face = "bold"),
-  #   axis.title      = element_text(size = 24),
-  #   axis.text       = element_text(size = 20),
-  #   legend.text     = element_text(size = 20),
     legend.position = "bottom"
   ) +
   transition_reveal(iteration)
+
+# animated post
+p2 <- ggplot(df, aes(x = p, y = post, color = chain)) +
+  geom_line(lwd = 2) +
+  geom_point(size = 4) +
+  labs(
+    title = "Iteration: {frame_along}",
+    x     = "p",
+    y     = "Posterior"
+  ) +
+  theme_minimal(base_size = 24) +
+  theme(
+    legend.position = "bottom"
+  ) +
+  transition_reveal(iteration)
+
 ```
 ```{r, include=FALSE, eval=FALSE}
 p1_ani <- animate(p1, nframes = n_iter, fps = 15, width = 600, height = 400)
 anim_save("images/mcmc_trace_simple.gif", animation = p1_ani)
+
+p2_ani <- animate(p2, nframes = n_iter, fps = 15, width = 600, height = 400)
+anim_save("images/mcmc_post_simple.gif", animation = p2_ani)
 ```
 
 ![](images/mcmc_trace_simple.gif)
+
+![](images/mcmc_post_simple.gif)
+
 :::
 
 ::: {.column width="50%"}
@@ -1250,10 +1269,9 @@ anim_save("images/mcmc_trace_simple.gif", animation = p1_ani)
 - Repeat the followings N times:
   - Propose a new value of *p* (say, *p* + 0.01 or *p* - 0.01)
   - Calculate the posterior for the new *p*.
-  - If the new posterior is larger than the current one, accept the new *p*; otherwise, keep the current *p*.
+  - If the new posterior is better (higher), accept the new *p*; otherwise, keep the current *p*.
 :::
 :::
-
 
 
 # Multilevel model

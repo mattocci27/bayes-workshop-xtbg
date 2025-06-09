@@ -982,7 +982,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <p><strong>Goal</strong>: Aproximate the posterior distribution of parameters given the data instead of calculating it directly.</p>
 <div class="fragment">
 <p>For simple models, we can analytically find parameters that maximize the posterior distribution.</p>
-<p>Coin A example again: <span class="math inline">\(\textcolor{#d95f02}{Post_A}\propto\textcolor{#1b9e77}{p^2 (1-p)^1} \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}\)</span> <span class="math inline">\(p = 52/103 \approx 0.505\)</span></p>
+<p>Coin B example again: <span class="math inline">\(\textcolor{#d95f02}{Post_B}\propto\textcolor{#1b9e77}{p^{60} (1-p)^{40}} \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}\)</span> <span class="math inline">\(p = 110/200 = 0.55\)</span></p>
 </div>
 </section>
 <section id="mcmc-simple-example" class="slide level2">
@@ -990,6 +990,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="columns">
 <div class="column" style="width:50%;">
 <p><img data-src="images/mcmc_trace_simple.gif"></p>
+<p><img data-src="images/mcmc_post_simple.gif"></p>
 </div><div class="column" style="width:50%;">
 <ul>
 <li>Start with some values of <em>p</em> (say 0.2 and 0.8)</li>
@@ -997,7 +998,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <li>Repeat the followings N times:
 <ul>
 <li>Propose a new value of <em>p</em> (say, <em>p</em> + 0.01 or <em>p</em> - 0.01)</li>
-<li>Calculate the posterior for the new <em>p</em></li>
+<li>Calculate the posterior for the new <em>p</em>.</li>
 <li>If the new posterior is larger than the current one, accept the new <em>p</em>; otherwise, keep the current <em>p</em>.</li>
 </ul></li>
 </ul>
