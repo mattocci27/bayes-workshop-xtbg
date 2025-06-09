@@ -1169,6 +1169,8 @@ mcmc_trace(draws_array, n_warmup = 0, facet_args = list(nrow = 3)) +
 
 **Goal**: Aproximate the posterior distribution of parameters given the data instead of calculating it directly.
 
+<br>
+
 ::: fragment
 For simple models, we can analytically find parameters that maximize the posterior distribution.
 
@@ -1177,10 +1179,10 @@ $\textcolor{#d95f02}{Post_B}\propto\textcolor{#1b9e77}{p^{60} (1-p)^{40}} \times
 $p = 110/200 = 0.55$
 :::
 
-## MCMC: simple example
+## MCMC: a simplified Metropolis-Hastings (MH) algorithm
 
 ::: columns
-::: {.column width="50%"}
+::: {.column width="40%"}
 
 ```{r mcmc-simple}
 # your log‐like and MCMC from above
@@ -1204,8 +1206,29 @@ mcmc_simple <- function(n_iter = 100, init_p = 0.2) {
   samples
 }
 
+mcmc_simple <- function(n_iter = 100, init_p = 0.2) {
+  samples  <- numeric(n_iter)
+  p_curr   <- init_p
+  L_curr   <- like_p(p_curr)
+  for (i in seq_len(n_iter)) {
+    p_prop <- p_curr + sample(c(-0.01, 0.01), 1)
+    if (p_prop <= 0 || p_prop >= 1) {
+      samples[i] <- p_curr
+      next
+    }
+    L_prop <- like_p(p_prop)
+    accept_prob <- exp(L_prop - L_curr)  # log-scale ratio
+    if (runif(1) < accept_prob) {
+      p_curr <- p_prop
+      L_curr <- L_prop
+    }
+    samples[i] <- p_curr
+  }
+  samples
+}
+
 set.seed(123)
-n_iter <- 100
+n_iter <- 200
 chain1 <- mcmc_simple(n_iter, init_p = 0.2)
 chain2 <- mcmc_simple(n_iter, init_p = 0.8)
 
@@ -1226,7 +1249,7 @@ p1 <- ggplot(df, aes(x = iteration, y = p, color = chain)) +
     x     = "Iteration",
     y     = "p"
   ) +
-  theme_minimal(base_size = 24) +
+  theme_minimal(base_size = 28) +
   theme(
     legend.position = "bottom"
   ) +
@@ -1241,7 +1264,7 @@ p2 <- ggplot(df, aes(x = p, y = post, color = chain)) +
     x     = "p",
     y     = "Posterior"
   ) +
-  theme_minimal(base_size = 24) +
+  theme_minimal(base_size = 28) +
   theme(
     legend.position = "bottom"
   ) +
@@ -1250,28 +1273,74 @@ p2 <- ggplot(df, aes(x = p, y = post, color = chain)) +
 ```
 ```{r, include=FALSE, eval=FALSE}
 p1_ani <- animate(p1, nframes = n_iter, fps = 15, width = 600, height = 400)
-anim_save("images/mcmc_trace_simple.gif", animation = p1_ani)
+anim_save("images/mcmc_trace_mh.gif", animation = p1_ani)
 
 p2_ani <- animate(p2, nframes = n_iter, fps = 15, width = 600, height = 400)
-anim_save("images/mcmc_post_simple.gif", animation = p2_ani)
+anim_save("images/mcmc_post_mh.gif", animation = p2_ani)
 ```
 
-![](images/mcmc_trace_simple.gif)
+![](images/mcmc_trace_mh.gif)
 
-![](images/mcmc_post_simple.gif)
+![](images/mcmc_post_mh.gif)
 
 :::
 
-::: {.column width="50%"}
+::: {.column width="60%"}
 
-- Start with some values of *p* (say 0.2 and 0.8)
-- Caclulate the posterior.
-- Repeat the followings N times:
-  - Propose a new value of *p* (say, *p* + 0.01 or *p* - 0.01)
-  - Calculate the posterior for the new *p*.
-  - If the new posterior is better (higher), accept the new *p*; otherwise, keep the current *p*.
+::: incremental
+- Start with some values of *p* (e.g., 0.2 and 0.8).
+- Caclulate the posterior of those values.
+- Repeat the followings steps N times:
+  - Propose a new value of $p_{\text{new}}$ (e.g., $p \pm 0.01$)
+  - Calculate the posterior at $p_{\text{new}}$.
+  - If $\text{Post}(p_{\text{new}}) \geq \text{Post}(p_t), \text{ then } p_{t+1} = p_{\text{new}}$.
+  - Else, accept $p_{\text{new}}$ with probability $\frac{\text{Post}(p_{\text{new}})}{\text{Post}(p_t)}$.
 :::
 :::
+:::
+
+## MCMC: Gibss sampling
+
+::: incremental
+
+- Sampling $\theta_1$, $\theta_2$ is hard: $p(\theta_1, \theta_2 \mid data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_1, \theta_2)$
+
+- Instead, we can sample $\theta_1$ and $\theta_2$ sequentially:
+
+  - $p(\theta_1 \mid \theta_2, data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_1  \mid \theta_2)$
+
+  - $p(\theta_2 \mid \theta_1, data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_2  \mid \theta_1)$
+
+  - $\theta_1^{(t)} \sim p(\theta_1 \mid \theta^{(t-1)}_2, data)$
+
+  - $\theta_2^{(t)} \sim p(\theta_2 \mid \theta^{(t)}_1, data)$
+
+:::
+
+
+
+```{r, eval=FALSE}
+gibbs_sampler <- function(n_iter = 1000, rho = 0.9) {
+  p <- q <- numeric(n_iter)
+  p[1] <- 0
+  q[1] <- 0
+  for (t in 2:n_iter) {
+    p[t] <- rnorm(1, mean = rho * q[t-1], sd = sqrt(1 - rho^2))
+    q[t] <- rnorm(1, mean = rho * p[t],   sd = sqrt(1 - rho^2))
+  }
+  tibble(iter = 1:n_iter, p = p, q = q)
+}
+
+library(ggplot2)
+library(tidyr)
+
+samples <- gibbs_sampler()
+samples_long <- pivot_longer(samples, cols = c(p, q), names_to = "param")
+
+ggplot(samples_long, aes(x = iter, y = value, color = param)) +
+  geom_line() +
+  theme_minimal(base_size = 16)
+```
 
 
 # Multilevel model
