@@ -96,7 +96,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="main_files/libs/revealjs/dist/theme/quarto-b0f621422a3111c0569b546321f77ff7.css">
+  <link rel="stylesheet" href="main_files/libs/revealjs/dist/theme/quarto-c346f62bff77774e7d13b34f0c4b0ef3.css">
   <link rel="stylesheet" href="assets/custom.css">
   <link href="main_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="main_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
@@ -421,7 +421,6 @@
 <li class="fragment"><p><span class="math inline">\(p\)</span>: survival rates, <span class="math inline">\(1-p\)</span>: mortality rate</p></li>
 <li class="fragment"><p><span class="math inline">\(L = {}_5C_2 p^2(1-p)^3\)</span> (Binomial distribution)</p></li>
 <li class="fragment"><p><span class="math inline">\(\mathrm{ln}\;L = \mathrm{ln}\;{}_5C_2 + 2\mathrm{ln}\;p + 3\mathrm{ln}(1-p)\)</span></p></li>
-<li class="fragment"><p><span class="math inline">\(\frac{d\mathrm{ln}\;L}{dt} = \frac{2}{p} - \frac{3}{1-p}  = 0\)</span></p></li>
 <li class="fragment"><p><span class="math inline">\(p = \frac{2}{5}\)</span></p></li>
 </ul>
 </div></div>
@@ -780,26 +779,39 @@ P(A \mid B) = \frac{P(B \mid A) \times P(A)}{P(B)}
 <section id="bayes-theorem-1" class="slide level2">
 <h2>Bayes’ theorem</h2>
 <p><span class="math display">\[
-P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Parameter}) \times P(\mathrm{Parameter})}{P(\mathrm{Data})}
+\textcolor{#d95f02}{
+  P(\mathrm{Parameter} \mid \mathrm{Data})
+}
+=
+\frac{
+\textcolor{#1b9e77} {
+  P(\mathrm{Data} \mid \mathrm{Parameter})
+} \times
+\textcolor{#7570b3} {
+  P(\mathrm{Parameter})}
+}
+{P(\mathrm{Data})}
 \]</span></p>
+<div class="small">
 <ul>
-<li class="fragment"><p><span class="math inline">\(P(\mathrm{Parameter} \mid \mathrm{Data})\)</span></p>
+<li class="fragment"><p><span class="math inline">\(\textcolor{#d95f02}{P(\mathrm{Parameter} \mid \mathrm{Data})}\)</span></p>
 <ul>
-<li class="fragment"><strong>What we want to estimate (posterior)</strong>: When we got our data, what were the parameters behind the data (e.g., coefficients of regressions)?</li>
+<li class="fragment"><strong>What we want to estimate (<span class="orange">posterior</span>)</strong>: When we got our data, what were the parameters behind the data (e.g., coefficients of regressions)?</li>
 </ul></li>
-<li class="fragment"><p><span class="math inline">\(P(\mathrm{Data} \mid \mathrm{Parameter})\)</span></p>
+<li class="fragment"><p><span class="math inline">\(\textcolor{#1b9e77}{P(\mathrm{Data} \mid \mathrm{Parameter})}\)</span></p>
 <ul>
-<li class="fragment">When we know our parameters, what is the probability of getting our data? (i.e., <strong>likelihood</strong>)</li>
+<li class="fragment">When we know our parameters, what is the probability of getting our data? (i.e., <strong><span class="teal">likelihood</span></strong>)</li>
 </ul></li>
-<li class="fragment"><p><span class="math inline">\(P(\mathrm{Parameter})\)</span></p>
+<li class="fragment"><p><span class="math inline">\(\textcolor{#7570b3}{P(\mathrm{Parameter})}\)</span></p>
 <ul>
-<li class="fragment">Probability to get our parameters. This is what we assume for our parameter before we see any data (i.e., <strong>prior??</strong> — next section).</li>
+<li class="fragment">Probability to get our parameters. This is what we assume for our parameter before we see any data (i.e., <strong><span class="purple">prior??</span></strong> — next section).</li>
 </ul></li>
 <li class="fragment"><p><span class="math inline">\(P(\mathrm{Data})\)</span></p>
 <ul>
 <li class="fragment">Independent with parameters (i.e., constant)</li>
 </ul></li>
 </ul>
+</div>
 </section>
 <section class="slide level2">
 
@@ -815,19 +827,18 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 <p>We compare two coins, A and B, with the same prior but different likelihood (due to data sizes) to illustrate how prior beliefs influence posterior estimates.</p>
 <h3 id="mle">MLE</h3>
 <ul>
-<li>A: 2 head out of 3 tosses -&gt; P(H) = 2/3 = 0.666</li>
-<li>B: 60 heads out of 100 tosses -&gt; P(H) = 60/100 = 0.6</li>
+<li class="fragment">A: 2 head out of 3 tosses -&gt; P(H) = 2/3 = 0.666</li>
+<li class="fragment">B: 60 heads out of 100 tosses -&gt; P(H) = 60/100 = 0.6</li>
 </ul>
-<div class="fragment">
 <div class="columns">
 <div class="column" style="width:50%;">
 <h3 id="bayesian">Bayesian</h3>
 <ul>
-<li><p><span class="math inline">\(L_A = {}_3C_2 p^2 (1-p)^1\)</span></p></li>
-<li><p><span class="math inline">\(L_B = {}_{100}C_{60} p^{60} (1-p)^{40}\)</span></p></li>
-<li><p><span class="math inline">\(\mathrm{Prior} \propto  p^{50} (1-p)^{50}\)</span></p>
+<li class="fragment"><p><span class="math inline">\(\textcolor{#1b9e77}{L_A = {}_3C_2 p^2 (1-p)^1}\)</span></p></li>
+<li class="fragment"><p><span class="math inline">\(\textcolor{#1b9e77}{L_B = {}_{100}C_{60} p^{60} (1-p)^{40}}\)</span></p></li>
+<li class="fragment"><p><span class="math inline">\(\textcolor{#7570b3}{\mathrm{Prior} \propto  p^{50} (1-p)^{50}}\)</span></p>
 <ul>
-<li>Beta distribution with mean 0.5 and small variance</li>
+<li class="fragment">Beta distribution with mean 0.5 and small variance</li>
 </ul></li>
 </ul>
 </div><div class="column" style="width:50%;">
@@ -841,15 +852,14 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 </div>
 </div>
 </div></div>
-</div>
 </section>
 <section id="bayesian-update-with-prior-coin-toss" class="slide level2">
 <h2>Bayesian Update with Prior (Coin Toss)</h2>
-<p>Posteiror <span class="math inline">\(\propto\)</span> Likelihood <span class="math inline">\(\times\)</span> Prior</p>
+<p><span class="orange">Posteiror</span> <span class="math inline">\(\propto\)</span> <span class="teal">Likelihood</span> <span class="math inline">\(\times\)</span> <span class="purple">Prior</span></p>
 <div class="columns">
 <div class="column" style="width:50%;">
 <div class="fragment">
-<p>Parameter <em>p</em> that maximizes the posterior of coin A. <span class="math inline">\(Post_A \propto p^2 (1-p)^1 \times p^{50} (1-p)^{50}\)</span> <span class="math inline">\(p = 52/103 \approx 0.505\)</span></p>
+<p>Parameter <em>p</em> that maximizes the posterior of coin A. <span class="math inline">\(\textcolor{#d95f02}{Post_A}\propto\textcolor{#1b9e77}{p^2 (1-p)^1} \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}\)</span> <span class="math inline">\(p = 52/103 \approx 0.505\)</span></p>
 </div>
 <div class="fragment">
 <ul>
@@ -858,7 +868,7 @@ P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Pa
 </div>
 </div><div class="column" style="width:50%;">
 <div class="fragment">
-<p>Parameter <em>p</em> that maximizes the posterior of coin B. <span class="math inline">\(Post_B \propto p^{60} (1-p)^{40} \times p^{50} (1-p)^{50}\)</span> <span class="math inline">\(p = 110/200 = 0.55\)</span></p>
+<p>Parameter <em>p</em> that maximizes the posterior of coin B. <span class="math inline">\(\textcolor{#d95f02}{Post_B} \propto \textcolor{#1b9e77}{p^{60} (1-p)^{40}} \times \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}\)</span> <span class="math inline">\(p = 110/200 = 0.55\)</span></p>
 </div>
 <div class="fragment">
 <ul>
@@ -970,7 +980,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <section id="mcmc-markov-chain-monte-carlo" class="slide level2">
 <h2>MCMC (Markov Chain Monte Carlo)</h2>
 <p>Goal: Aproximate the posterior distribution of parameters given the data instead of calculating it directly.</p>
-<p>For simple models, we can fith parameters that maximize the posterior distribution.</p>
+<p>For simple models, we can find parameters that maximize the posterior distribution.</p>
 <p>Coin A example again: <span class="math display">\[
 \textcolor{#1b9e77}{\text{Posterior}} \propto
 \textcolor{#d95f02}{p^{50}(1 - p)^{50}} \times

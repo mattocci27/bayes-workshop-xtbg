@@ -241,8 +241,6 @@ tibble(x, y) |>
 
 - $\mathrm{ln}\;L = \mathrm{ln}\;{}_5C_2 + 2\mathrm{ln}\;p + 3\mathrm{ln}(1-p)$
 
-- $\frac{d\mathrm{ln}\;L}{dt} = \frac{2}{p} - \frac{3}{1-p}  = 0$
-
 - $p = \frac{2}{5}$
 :::
 :::
@@ -863,28 +861,39 @@ This isn’t intuitive, but it’s the probability we actually care about — ho
 ## Bayes' theorem
 
 $$
-P(\mathrm{Parameter} \mid \mathrm{Data}) = \frac{P(\mathrm{Data} \mid \mathrm{Parameter}) \times P(\mathrm{Parameter})}{P(\mathrm{Data})}
+\textcolor{#d95f02}{
+  P(\mathrm{Parameter} \mid \mathrm{Data})
+}
+=
+\frac{
+\textcolor{#1b9e77} {
+  P(\mathrm{Data} \mid \mathrm{Parameter})
+} \times
+\textcolor{#7570b3} {
+  P(\mathrm{Parameter})}
+}
+{P(\mathrm{Data})}
 $$
 
-<!-- ::: small -->
+::: small
 ::: incremental
-- $P(\mathrm{Parameter} \mid \mathrm{Data})$
+- $\textcolor{#d95f02}{P(\mathrm{Parameter} \mid \mathrm{Data})}$
 
-  - **What we want to estimate (posterior)**: When we got our data, what were the parameters behind the data (e.g., coefficients of regressions)?
+  - **What we want to estimate ([posterior]{.orange})**: When we got our data, what were the parameters behind the data (e.g., coefficients of regressions)?
 
-- $P(\mathrm{Data} \mid \mathrm{Parameter})$
+- $\textcolor{#1b9e77}{P(\mathrm{Data} \mid \mathrm{Parameter})}$
 
-  - When we know our parameters, what is the probability of getting our data? (i.e., **likelihood**)
+  - When we know our parameters, what is the probability of getting our data? (i.e., **[likelihood]{.teal}**)
 
-- $P(\mathrm{Parameter})$
+- $\textcolor{#7570b3}{P(\mathrm{Parameter})}$
 
-  - Probability to get our parameters. This is what we assume for our parameter before we see any data (i.e., **prior??** — next section).
+  - Probability to get our parameters. This is what we assume for our parameter before we see any data (i.e., **[prior??]{.purple}** — next section).
 
 - $P(\mathrm{Data})$
 
   - Independent with parameters (i.e., constant)
 :::
-<!-- ::: -->
+:::
 
 ---
 
@@ -900,11 +909,14 @@ y <- my_prior(x)
 y2 <- my_like(x)
 y3 <- y * y2
 
+dark2 <- brewer.pal(3, "Dark2")
+
 p1 <- tibble(x, Prior = y * 10^29.5, Likelihood = y2, Posterior = y3 * 10^30.5) |>
   pivot_longer(Prior:Posterior) |>
   mutate(name = factor(name, levels = c("Posterior", "Likelihood", "Prior"))) |>
   ggplot(aes(x = x, y = value, color = name)) +
   geom_line(size = 1.5) +
+  scale_color_manual(values = c(dark2[2], dark2[1], dark2[3])) +
   ylab("Probability") +
   xlab("Parameter") +
   theme(
@@ -913,6 +925,7 @@ p1 <- tibble(x, Prior = y * 10^29.5, Likelihood = y2, Posterior = y3 * 10^30.5) 
     legend.title = element_blank(),
     axis.text.y = element_blank()
     )
+
 p1
 
 ggsave("images/priors.png", p1, width = 10, height = 6)
@@ -921,22 +934,22 @@ ggsave("images/priors.png", p1, width = 10, height = 6)
 ##  Prior vs. Data: MLE and Bayesian comparison (Coin Toss)
 We compare two coins, A and B, with the same prior but different likelihood (due to data sizes) to illustrate how prior beliefs influence posterior estimates.
 
+::: incremental
+
 ### MLE
 
 - A: 2 head out of 3 tosses -> P(H) = 2/3 = 0.666
 - B: 60 heads out of 100 tosses -> P(H) = 60/100 = 0.6
 
-::: fragment
 ::: columns
 ::: {.column width="50%"}
-
 ### Bayesian
 
-- $L_A = {}_3C_2 p^2 (1-p)^1$
+- $\textcolor{#1b9e77}{L_A = {}_3C_2 p^2 (1-p)^1}$
 
-- $L_B = {}_{100}C_{60} p^{60} (1-p)^{40}$
+- $\textcolor{#1b9e77}{L_B = {}_{100}C_{60} p^{60} (1-p)^{40}}$
 
-- $\mathrm{Prior} \propto  p^{50} (1-p)^{50}$
+- $\textcolor{#7570b3}{\mathrm{Prior} \propto  p^{50} (1-p)^{50}}$
   - Beta distribution with mean 0.5 and small variance
 
 :::
@@ -956,8 +969,8 @@ tibble(x, prior = y * 10^29.5) %>%
     axis.title = element_text(size = 32))
 
 ```
-
 :::
+
 :::
 :::
 
@@ -965,15 +978,14 @@ tibble(x, prior = y * 10^29.5) %>%
 
 ##  Bayesian Update with Prior (Coin Toss)
 
-Posteiror $\propto$ Likelihood $\times$ Prior
+[Posteiror]{.orange} $\propto$ [Likelihood]{.teal} $\times$ [Prior]{.purple}
 
 ::: columns
 ::: {.column width="50%"}
 
-
 ::: fragment
 Parameter *p* that maximizes the posterior of coin A.
-$Post_A \propto p^2 (1-p)^1 \times p^{50} (1-p)^{50}$
+$\textcolor{#d95f02}{Post_A}\propto\textcolor{#1b9e77}{p^2 (1-p)^1} \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}$
 $p = 52/103 \approx 0.505$
 :::
 ::: fragment
@@ -984,7 +996,7 @@ $p = 52/103 \approx 0.505$
 ::: {.column width="50%"}
 ::: fragment
 Parameter *p* that maximizes the posterior of coin B.
-$Post_B \propto p^{60} (1-p)^{40} \times p^{50} (1-p)^{50}$
+$\textcolor{#d95f02}{Post_B} \propto \textcolor{#1b9e77}{p^{60} (1-p)^{40}} \times \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}$
 $p = 110/200 = 0.55$
 :::
 

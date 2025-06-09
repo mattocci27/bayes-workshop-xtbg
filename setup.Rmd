@@ -12,6 +12,7 @@ library(patchwork)
 library(gganimate)
 library(targets)
 library(here)
+library(RColorBrewer)
 source(here("R/functions.R"))
 ```
 
