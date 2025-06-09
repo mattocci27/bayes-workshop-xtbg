@@ -979,16 +979,29 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 </section>
 <section id="mcmc-markov-chain-monte-carlo" class="slide level2">
 <h2>MCMC (Markov Chain Monte Carlo)</h2>
-<p>Goal: Aproximate the posterior distribution of parameters given the data instead of calculating it directly.</p>
-<p>For simple models, we can find parameters that maximize the posterior distribution.</p>
-<p>Coin A example again: <span class="math display">\[
-\textcolor{#1b9e77}{\text{Posterior}} \propto
-\textcolor{#d95f02}{p^{50}(1 - p)^{50}} \times
-\textcolor{#7570b3}{p^2(1 - p)^1}
-\]</span></p>
+<p><strong>Goal</strong>: Aproximate the posterior distribution of parameters given the data instead of calculating it directly.</p>
 <div class="fragment">
-<p>Coin A example again: <span class="math inline">\(Post_A \propto p^2 (1-p)^1 \times p^{50} (1-p)^{50}\)</span> <span class="math inline">\(p = 52/103 \approx 0.505\)</span></p>
+<p>For simple models, we can analytically find parameters that maximize the posterior distribution.</p>
+<p>Coin A example again: <span class="math inline">\(\textcolor{#d95f02}{Post_A}\propto\textcolor{#1b9e77}{p^2 (1-p)^1} \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}\)</span> <span class="math inline">\(p = 52/103 \approx 0.505\)</span></p>
 </div>
+</section>
+<section id="mcmc-simple-example" class="slide level2">
+<h2>MCMC: simple example</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="images/mcmc_trace_simple.gif"></p>
+</div><div class="column" style="width:50%;">
+<ul>
+<li>Start with some values of <em>p</em> (say 0.2 and 0.8)</li>
+<li>Caclulate the posterior.</li>
+<li>Repeat the followings N times:
+<ul>
+<li>Propose a new value of <em>p</em> (say, <em>p</em> + 0.01 or <em>p</em> - 0.01)</li>
+<li>Calculate the posterior for the new <em>p</em></li>
+<li>If the new posterior is larger than the current one, accept the new <em>p</em>; otherwise, keep the current <em>p</em>.</li>
+</ul></li>
+</ul>
+</div></div>
 </section></section>
 <section>
 <section id="multilevel-model" class="title-slide slide level1 center">
@@ -1290,7 +1303,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-27-1.png" class="quarto-figure quarto-figure-center" width="672"></p>
+<p><img data-src="figure/unnamed-chunk-28-1.png" class="quarto-figure quarto-figure-center" width="672"></p>
 </figure>
 </div>
 </div>
@@ -1371,7 +1384,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-28-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-29-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1382,7 +1395,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-29-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-30-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1553,7 +1566,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-32-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-33-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>

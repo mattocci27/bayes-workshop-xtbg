@@ -1167,24 +1167,94 @@ mcmc_trace(draws_array, n_warmup = 0, facet_args = list(nrow = 3)) +
 
 ## MCMC (Markov Chain Monte Carlo)
 
-Goal: Aproximate the posterior distribution of parameters given the data instead of calculating it directly.
-
-For simple models, we can find parameters that maximize the posterior distribution.
-
-
-Coin A example again:
-$$
-\textcolor{#1b9e77}{\text{Posterior}} \propto
-\textcolor{#d95f02}{p^{50}(1 - p)^{50}} \times
-\textcolor{#7570b3}{p^2(1 - p)^1}
-$$
-
+**Goal**: Aproximate the posterior distribution of parameters given the data instead of calculating it directly.
 
 ::: fragment
+For simple models, we can analytically find parameters that maximize the posterior distribution.
+
 Coin A example again:
-$Post_A \propto p^2 (1-p)^1 \times p^{50} (1-p)^{50}$
+$\textcolor{#d95f02}{Post_A}\propto\textcolor{#1b9e77}{p^2 (1-p)^1} \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}$
 $p = 52/103 \approx 0.505$
 :::
+
+## MCMC: simple example
+
+::: columns
+::: {.column width="50%"}
+
+```{r mcmc-simple}
+# your log‐like and MCMC from above
+like_p <- function(p) {
+  if (p <= 0 || p >= 1) return(-Inf)
+  52*log(p) + 51*log(1-p)
+}
+mcmc_simple <- function(n_iter = 100, init_p = 0.2) {
+  samples  <- numeric(n_iter)
+  p_curr   <- init_p
+  L_curr   <- like_p(p_curr)
+  for (i in seq_len(n_iter)) {
+    p_prop <- p_curr + sample(c(-0.01, 0.01), 1)
+    L_prop <- like_p(p_prop)
+    if (L_prop > L_curr) {
+      p_curr <- p_prop
+      L_curr <- L_prop
+    }
+    samples[i] <- p_curr
+  }
+  samples
+}
+
+set.seed(123)
+n_iter <- 100
+chain1 <- mcmc_simple(n_iter, init_p = 0.2)
+chain2 <- mcmc_simple(n_iter, init_p = 0.8)
+
+# build a long data frame
+df <- tibble(
+  iteration = 1:n_iter,
+  `chain 1`  = chain1,
+  `chain 2`  = chain2) |>
+  pivot_longer(-iteration, names_to = "chain", values_to = "p")
+
+# animated trace
+p1 <- ggplot(df, aes(x = iteration, y = p, color = chain)) +
+  geom_line(lwd = 2) +
+  geom_point(size = 4) +
+  labs(
+    title = "Iteration: {frame_along}",
+    x     = "Iteration",
+    y     = "p"
+  ) +
+  theme_minimal(base_size = 24) +
+  theme(
+  #   plot.title      = element_text(size = 26, face = "bold"),
+  #   axis.title      = element_text(size = 24),
+  #   axis.text       = element_text(size = 20),
+  #   legend.text     = element_text(size = 20),
+    legend.position = "bottom"
+  ) +
+  transition_reveal(iteration)
+```
+```{r, include=FALSE, eval=FALSE}
+p1_ani <- animate(p1, nframes = n_iter, fps = 15, width = 600, height = 400)
+anim_save("images/mcmc_trace_simple.gif", animation = p1_ani)
+```
+
+![](images/mcmc_trace_simple.gif)
+:::
+
+::: {.column width="50%"}
+
+- Start with some values of *p* (say 0.2 and 0.8)
+- Caclulate the posterior.
+- Repeat the followings N times:
+  - Propose a new value of *p* (say, *p* + 0.01 or *p* - 0.01)
+  - Calculate the posterior for the new *p*.
+  - If the new posterior is larger than the current one, accept the new *p*; otherwise, keep the current *p*.
+:::
+:::
+
+
 
 # Multilevel model
 

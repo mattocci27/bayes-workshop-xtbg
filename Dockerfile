@@ -10,9 +10,7 @@ USER root
 
 RUN apt-get update -q -y \
   && apt-get install --no-install-recommends --fix-missing -y \
-    libudunits2-dev \
-    gdal-bin \
-    libgdal-dev \
+    libmagick++-dev \
   && apt-get autoremove -y \
   && apt-get clean all
 
