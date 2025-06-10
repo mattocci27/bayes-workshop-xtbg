@@ -7,6 +7,7 @@ library(furrr)
 
 
 source("R/functions.R")
+source("R/hmc.R")
 
 # parallel computing on local or on the same node
 plan(multicore)
@@ -20,6 +21,8 @@ tar_option_set(packages = c(
   "ggrepel",
   "patchwork",
   "janitor",
+  "showtext",
+  "animation",
   "loo"
 ))
 
@@ -48,12 +51,18 @@ list(
     dummy_simple_re,
     add_p(dummy_simple, simple_summary_logistic)
   ),
-
-
-  tar_quarto(
-    main,
-    "main.qmd"
+  tar_target(
+    leapfrog_list,
+    generate_leapfrog_list()
   ),
-
+  tar_target(
+    leapfrog_gif,
+    make_leapfrog_gif(leapfrog_list, out = "hoge.gif"),
+    format = "file"
+  ),
+  # tar_quarto(
+  #   main,
+  #   "main.qmd"
+  # ),
   NULL
 )
