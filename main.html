@@ -983,7 +983,9 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <p><br></p>
 <div class="fragment">
 <p>For simple models, we can analytically find parameters that maximize the posterior distribution.</p>
-<p>Coin B example again: <span class="math inline">\(\textcolor{#d95f02}{Post_B}\propto\textcolor{#1b9e77}{p^{60} (1-p)^{40}} \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}\)</span> <span class="math inline">\(p = 110/200 = 0.55\)</span></p>
+<p>Coin B example again:</p>
+<p><span class="math inline">\(\textcolor{#d95f02}{Post_B}\propto\textcolor{#1b9e77}{p^{60} (1-p)^{40}} \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}\)</span></p>
+<p><span class="math inline">\(p = 110/200 = 0.55\)</span></p>
 </div>
 </section>
 <section id="mcmc-a-simplified-metropolis-hastings-mh-algorithm" class="slide level2">
@@ -1006,18 +1008,40 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 </ul>
 </div></div>
 </section>
-<section id="mcmc-gibss-sampling" class="slide level2">
-<h2>MCMC: Gibss sampling</h2>
+<section id="mcmc-gibbs-sampling" class="slide level2">
+<h2>MCMC: Gibbs sampling</h2>
 <ul>
-<li class="fragment"><p>Sampling <span class="math inline">\(\theta_1\)</span>, <span class="math inline">\(\theta_2\)</span> is hard: <span class="math inline">\(p(\theta_1, \theta_2 \mid data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_1, \theta_2)\)</span></p></li>
-<li class="fragment"><p>Instead, we can sample <span class="math inline">\(\theta_1\)</span> and <span class="math inline">\(\theta_2\)</span> sequentially:</p>
+<li class="fragment"><p>Sampling <span class="math inline">\(\theta_1\)</span>, <span class="math inline">\(\theta_2\)</span> jointly is hard: <span class="math inline">\(p(\theta_1, \theta_2 \mid data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_1, \theta_2)\)</span></p></li>
+<li class="fragment"><p>Instead, we sample <span class="math inline">\(\theta_1\)</span> and <span class="math inline">\(\theta_2\)</span> sequentially:</p>
 <ul>
 <li class="fragment"><p><span class="math inline">\(p(\theta_1 \mid \theta_2, data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_1  \mid \theta_2)\)</span></p></li>
 <li class="fragment"><p><span class="math inline">\(p(\theta_2 \mid \theta_1, data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_2  \mid \theta_1)\)</span></p></li>
 <li class="fragment"><p><span class="math inline">\(\theta_1^{(t)} \sim p(\theta_1 \mid \theta^{(t-1)}_2, data)\)</span></p></li>
 <li class="fragment"><p><span class="math inline">\(\theta_2^{(t)} \sim p(\theta_2 \mid \theta^{(t)}_1, data)\)</span></p></li>
 </ul></li>
+<li class="fragment"><p>Gibbs sampling approximates the joint posterior by sampling from these full conditionals.</p></li>
+<li class="fragment"><p>Implemented in BUGS and JAGS software</p></li>
 </ul>
+</section>
+<section id="mcmc-hamiltonian-monte-carlo-hmc" class="slide level2">
+<h2>MCMC: Hamiltonian Monte Carlo (HMC)</h2>
+<div class="columns">
+<div class="column" style="width:40%;">
+<p><img data-src="images/hamiltonian.gif"></p>
+<p><img data-src="images/mcmc_hmc.gif"></p>
+</div><div class="column" style="width:60%;">
+<ul>
+<li><p><span class="math inline">\(H(\theta, p) = h(\theta) + p^2/2\)</span> (Hamitonian: potential energy + kinetic energy = constant)</p></li>
+<li><p>Contour lines of <span class="math inline">\(H(\theta, p)\)</span> in the phase space (<span class="math inline">\(\theta\)</span> vs.&nbsp;<span class="math inline">\(p\)</span>)</p></li>
+<li><p>Instead of sampling from <span class="math inline">\(p(\theta \mid data)\)</span>, HMC samples from a joint distribution over both.</p></li>
+</ul>
+<p><span class="math display">\[
+p(\theta, r) \propto exp(-H(\theta, r))
+\]</span></p>
+<p><span class="math display">\[
+p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
+\]</span></p>
+</div></div>
 </section></section>
 <section>
 <section id="multilevel-model" class="title-slide slide level1 center">
@@ -1319,7 +1343,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-29-1.png" class="quarto-figure quarto-figure-center" width="672"></p>
+<p><img data-src="figure/unnamed-chunk-32-1.png" class="quarto-figure quarto-figure-center" width="672"></p>
 </figure>
 </div>
 </div>
@@ -1400,7 +1424,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-30-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-33-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1411,7 +1435,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-31-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-34-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1582,7 +1606,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-34-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-37-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>

@@ -1175,7 +1175,9 @@ mcmc_trace(draws_array, n_warmup = 0, facet_args = list(nrow = 3)) +
 For simple models, we can analytically find parameters that maximize the posterior distribution.
 
 Coin B example again:
+
 $\textcolor{#d95f02}{Post_B}\propto\textcolor{#1b9e77}{p^{60} (1-p)^{40}} \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}$
+
 $p = 110/200 = 0.55$
 :::
 
@@ -1299,13 +1301,14 @@ anim_save("images/mcmc_post_mh.gif", animation = p2_ani)
 :::
 :::
 
-## MCMC: Gibss sampling
+## MCMC: Gibbs sampling
 
 ::: incremental
 
-- Sampling $\theta_1$, $\theta_2$ is hard: $p(\theta_1, \theta_2 \mid data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_1, \theta_2)$
+- Sampling $\theta_1$, $\theta_2$ jointly is hard:
+$p(\theta_1, \theta_2 \mid data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_1, \theta_2)$
 
-- Instead, we can sample $\theta_1$ and $\theta_2$ sequentially:
+- Instead, we sample $\theta_1$ and $\theta_2$ sequentially:
 
   - $p(\theta_1 \mid \theta_2, data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_1  \mid \theta_2)$
 
@@ -1314,6 +1317,10 @@ anim_save("images/mcmc_post_mh.gif", animation = p2_ani)
   - $\theta_1^{(t)} \sim p(\theta_1 \mid \theta^{(t-1)}_2, data)$
 
   - $\theta_2^{(t)} \sim p(\theta_2 \mid \theta^{(t)}_1, data)$
+
+- Gibbs sampling approximates the joint posterior by sampling from these full conditionals.
+
+- Implemented in BUGS and JAGS software
 
 :::
 
@@ -1341,6 +1348,207 @@ ggplot(samples_long, aes(x = iter, y = value, color = param)) +
   geom_line() +
   theme_minimal(base_size = 16)
 ```
+
+## MCMC: Hamiltonian Monte Carlo (HMC)
+
+```{r}
+h <- function(theta, shape, rate) {
+  #-dgamma(theta, shape = shape, rate = rate, log = T)
+  rate * theta - (shape - 1) * log(theta)
+}
+
+dh_dtheta <- function(theta, shape, rate) {
+  rate - (shape - 1) /theta
+}
+
+hamiltonian <- function(p, theta, shape, rate) {
+  h(theta, shape, rate) + 0.5 * p^2
+}
+
+leapfrog_nexthalf_p <- function(p, theta, shape, rate, eps = 0.01) {
+  p - 0.5 * eps * dh_dtheta(theta, shape, rate)
+}
+
+leapfrog_next_theta <- function(p, theta, eps = 0.01) {
+  theta + eps * p
+}
+
+# hamiltonian(p = 3, theta = 1, shape = 11, rate = 13)
+
+move_one_step <- function(theta, shape, rate, p, eps = 0.01, L = 100, stlide = 1) {
+  res <- c(1, p, theta, hamiltonian(p, theta, shape, rate))
+  res2 <- NULL
+  for (i in 1:L) {
+    p <- leapfrog_nexthalf_p(p, theta, shape, rate, eps)
+    theta <- leapfrog_next_theta(p, theta, eps)
+    p <- leapfrog_nexthalf_p(p, theta, shape, rate, eps)
+    res <- c(1, p, theta, hamiltonian(p, theta, shape, rate))
+    res2 <- rbind(res2, res)
+  }
+  res3 <- res2 %>%
+    as_data_frame %>%
+    rename(temp = V1,
+           p = V2,
+           theta = V3,
+           hamiltonian = V4)
+  res3 %>%
+    filter(row_number() %% stlide == 0)
+}
+
+shape <- 11
+rate <- 13
+pot_eng <- function(theta, shape, rate) {
+  rate * theta - (shape - 1) * log(theta)
+}
+
+theta <- seq(0.01, 3, length = 200)
+
+h_dat <- data_frame(h = pot_eng(theta, shape = shape, rate = rate), theta)
+
+# initial param
+theta <- 0.1
+p <- 0
+eps <- 0.01
+L <- 200
+shape <- 11
+rate <- 13
+
+# dh_dtheta(theta, shape, rate)
+# hamiltonian(p, theta, shape, rate)
+# leapfrog_nexthalf_p(p, theta, shape, rate, eps)
+# leapfrog_next_theta(p, theta, eps)
+
+res <- move_one_step(theta, shape, rate, p, eps = eps, L = L)
+
+xx <- seq(-5, 5, length = 200)
+yy <- seq(0.01, 3, length = 200)
+xy <- expand.grid(xx, yy)
+
+zz <- hamiltonian(p = xy$Var1, theta = xy$Var2, shape  = shape, rate = rate)
+
+cont_dat <- data_frame(p = xy$Var1,
+                       theta = xy$Var2,
+                       hamiltonian = zz)
+
+p_eng <- function(H, h){
+  sqrt(2 * (H - h))
+}
+
+h_dat2 <- data_frame(h = pot_eng(res$theta, shape = shape, rate = rate),
+                     theta = res$theta) %>%
+  mutate(p = p_eng(max(h), h)) %>%
+  mutate(hamiltonian = h + 0.5 * p^2) %>%
+  mutate(theta_diff = theta - c(0, theta)[-201]) %>%
+  mutate(p = ifelse(theta_diff > 0, p, -p))
+
+
+```
+
+```{r}
+n_max <- 200
+h_dat2_anim <- h_dat2 %>%
+  slice(1:n_max) %>%
+  mutate(frame = row_number())
+
+res_anim <- res %>%
+  slice(1:n_max) %>%
+  mutate(frame = row_number())
+
+# Panel 1: potential energy
+p1 <- ggplot(h_dat2_anim, aes(x = theta, y = h)) +
+  geom_line(data = h_dat2, aes(x = theta, y = h)) +
+  geom_point(color = "blue", size = 4) +
+  geom_segment(
+    aes(
+      x    = theta,
+      xend = ifelse(p > 0,
+                    theta + exp(p)/100,
+                    theta - exp(-p)/100),
+      y    = h,
+      yend = h
+    ),
+    arrow = arrow(length = unit(0.05, "npc")),
+    color = "blue"
+  ) +
+  coord_cartesian(xlim = c(-0.2, 3.5)) +
+  theme_bw(base_size = 28) +
+  # labs(title = "Potential energy (h) — fr") +
+  transition_reveal(frame)
+
+
+# Panel 2: phase space contour + trajectory
+p2 <- ggplot(cont_dat, aes(x = theta, y = p)) +
+  geom_contour(aes(z = hamiltonian),
+               bins = 50, size = 0.2) +
+  geom_point(data = res_anim,
+             aes(x = theta, y = p),
+             color = "red", size = 4) +
+  coord_cartesian(xlim = c(-0.2, 3.5),
+                  ylim = c(min(res$p), max(res$p))) +
+  theme_bw(base_size = 28) +
+  # labs(title = "Phase space (p vs θ) — frame {current_frame}") +
+  transition_reveal(frame)
+
+```
+
+```{r, include=FALSE, eval=FALSE}
+p1_ani <- animate(p1, nframes = n_max, fps = 30, width = 600, height = 400)
+anim_save("images/hamiltonian.gif", animation = p1_ani)
+
+p2_ani <- animate(p2, nframes = n_max, fps = 30, width = 600, height = 400)
+anim_save("images/mcmc_hmc.gif", animation = p2_ani)
+```
+
+::: columns
+
+::: {.column width=40%}
+![](images/hamiltonian.gif)
+
+![](images/mcmc_hmc.gif)
+:::
+
+::: {.column width=60%}
+
+- $H(\theta, p) = h(\theta) + p^2/2$ (Hamitonian: potential energy + kinetic energy = constant)
+
+- Contour lines of $H(\theta, p)$ in the phase space ($\theta$ vs. $p$)
+
+- Instead of sampling from $p(\theta \mid data)$, HMC samples from a joint distribution over both.
+
+$$
+p(\theta, r) \propto exp(-H(\theta, r))
+$$
+
+$$
+p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
+$$
+
+:::
+:::
+
+
+## MCMC: Hamiltonian Monte Carlo (HMC)
+
+```{r}
+
+```
+
+
+::: columns
+
+::: {.column width=40%}
+![](images/hamiltonian.gif)
+
+:::
+
+::: {.column width=60%}
+
+- hoge
+
+:::
+:::
+
+
 
 
 # Multilevel model
