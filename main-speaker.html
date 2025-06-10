@@ -1042,6 +1042,65 @@ p(\theta, r) \propto exp(-H(\theta, r))
 p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
 \]</span></p>
 </div></div>
+</section>
+<section id="mcmc-hamiltonian-monte-carlo-hmc-1" class="slide level2">
+<h2>MCMC: Hamiltonian Monte Carlo (HMC)</h2>
+<div class="columns">
+<div class="column" style="width:40%;">
+<p><img data-src="images/leapfrog.gif"></p>
+</div><div class="column" style="width:60%;">
+<ul>
+<li>hoge</li>
+</ul>
+</div></div>
+</section>
+<section id="mcmc-methods-comparison" class="slide level2">
+<h2>MCMC Methods: Comparison</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 24%">
+<col style="width: 28%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th><strong>Metropolis(-Hastings)</strong></th>
+<th><strong>Gibbs Sampling</strong></th>
+<th><strong>Hamiltonian Monte Carlo (HMC)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>How it works</td>
+<td>Try random moves, accept/reject</td>
+<td>Update one parameter at a time</td>
+<td>Simulate smooth movement using gradients</td>
+</tr>
+<tr class="even">
+<td>Efficient in high dimensions?</td>
+<td>❌ Often slow</td>
+<td>✅ If math is simple</td>
+<td>✅ Very efficient</td>
+</tr>
+<tr class="odd">
+<td>Flexible?</td>
+<td>✅ Yes</td>
+<td>❌ No (conjugate priors)</td>
+<td>✅ Yes</td>
+</tr>
+<tr class="even">
+<td>Typical software</td>
+<td>JAGS, custom R</td>
+<td>JAGS, BUGS</td>
+<td>Stan, brms, cmdstanr</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="stan-a-modern-language-for-bayesian-modeling" class="slide level2">
+<h2>Stan: A modern language for Bayesian modeling</h2>
 </section></section>
 <section>
 <section id="multilevel-model" class="title-slide slide level1 center">
@@ -1343,7 +1402,7 @@ p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-32-1.png" class="quarto-figure quarto-figure-center" width="672"></p>
+<p><img data-src="figure/unnamed-chunk-34-1.png" class="quarto-figure quarto-figure-center" width="672"></p>
 </figure>
 </div>
 </div>
@@ -1424,7 +1483,7 @@ p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-33-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-35-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1435,7 +1494,7 @@ p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-34-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-36-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1606,7 +1665,7 @@ p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-37-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-39-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>

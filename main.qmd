@@ -1426,7 +1426,7 @@ xy <- expand.grid(xx, yy)
 
 zz <- hamiltonian(p = xy$Var1, theta = xy$Var2, shape  = shape, rate = rate)
 
-cont_dat <- data_frame(p = xy$Var1,
+cont_dat <- tibble(p = xy$Var1,
                        theta = xy$Var2,
                        hamiltonian = zz)
 
@@ -1530,6 +1530,135 @@ $$
 ## MCMC: Hamiltonian Monte Carlo (HMC)
 
 ```{r}
+.libPaths(c("/home/rstudio/vscode-R/renv/library/linux-ubuntu-noble/R-4.5/x86_64-pc-linux-gnu", .libPaths()))
+
+#–– initialize empty tibbles with the right columns ––
+step  <- tibble(temp = double(),
+                p    = double(),
+                prev_p = double(),
+                hamiltonian = double(),
+                gr   = integer())
+
+step2 <- tibble(theta      = double(),
+                p          = double(),
+                hamiltonian= double(),
+                gr3        = integer())
+
+#–– your settings ––
+set.seed(123)
+theta   <- 2.5
+eps     <- 0.01
+T       <- 15
+scale_p <- 1
+prev_p  <- 0
+L       <- 96
+
+for (tau in seq_len(T)) {
+  # 1) draw a fresh momentum
+  p <- rnorm(1, 0, scale_p)
+
+  # 2) record that "kick" (you had this already)
+  step <- bind_rows(
+    step,
+    tibble(temp = 2, p = p, prev_p = prev_p, hamiltonian = 0, gr = tau)
+  )
+
+  # 3) run the leapfrog chain for L steps
+  one_step <- move_one_step(theta, shape, rate,
+                            p, eps = eps, L = L,
+                            stlide = 12) %>%
+    as_tibble() %>%
+    mutate(gr = tau)  # group id for the whole trajectory
+
+  # 5) append
+  step  <- bind_rows(step, one_step)
+  # 6) update for the next iteration
+  theta  <- one_step$theta[nrow(one_step)]
+  prev_p <- one_step$p[nrow(one_step)]
+}
+
+
+# 1) Tidy the point data --------------------------------------------------
+step_anim <- step %>%
+  filter(temp != 2) %>%  # drop your “kick” markers
+  mutate(
+    gr    = factor(gr),            # grouping by Hamiltonian chunk
+    time  = row_number()           # frame index
+  )
+
+step_segs <- step_anim %>%
+  transmute(
+    # start at the current point
+    theta_start = theta,
+    p_start     = p,
+    # end at the *next* point
+    theta_end   = lead(theta),
+    p_end       = lead(p),
+    # only draw at the *current* time
+    time       = time,
+    # flag if this is the boundary between two Hamiltonians
+    is_jump     = (gr != lead(gr))
+  ) #%>%
+  # filter(is_jump)  # keep only those that cross gr → lead(gr)
+
+
+p4 <- ggplot() +
+  # static Hamiltonian contours
+  geom_contour(
+    data = cont_dat,
+    aes(x = theta, y = p, z = hamiltonian),
+    bins = 50, size = 0.2
+  ) +
+  # dashed path of all past leapfrog points
+  geom_path(
+    data = step_anim,
+    aes(x = theta, y = p, group = gr),
+    linetype = "dashed"
+  ) +
+  # cumulative blue points
+  geom_point(
+    data = step_anim,
+    aes(x = theta, y = p),
+    colour = "blue", size = 2
+  ) +
+  geom_segment(
+    data = step_segs,
+    aes(
+      x     = theta_start,
+      y     = p_start,
+      xend  = theta_end,
+      yend  = p_end
+    ),
+    colour = "red",
+    linewidth   = 1,
+    na.rm  = TRUE
+  ) +
+  coord_cartesian(xlim = c(-0.2, 3.5),
+                  ylim = c(-5,     5   )) +
+  theme_light() +
+  labs(title = "Leapfrog HMC — step {current_frame}")  +
+  transition_reveal(along = time) +
+  shadow_mark(past = TRUE, future = FALSE) +
+  ease_aes("linear")
+
+# 4) Render to GIF --------------------------------------------------------
+
+n_max <- max(step_anim$time)
+
+```
+
+```{r, eval=FALSE}
+# 3. Render to GIF ------------------------------------------------------
+
+p4_ani <- animate(
+  p4,
+  nframes  = max(step_anim$time),  # = nrow(step)
+  fps      = 20,
+  width    = 480,
+  height   = 240,
+  renderer = gifski_renderer("images/leapfrog.gif")
+)
+
 
 ```
 
@@ -1537,7 +1666,7 @@ $$
 ::: columns
 
 ::: {.column width=40%}
-![](images/hamiltonian.gif)
+![](images/leapfrog.gif)
 
 :::
 
@@ -1547,6 +1676,19 @@ $$
 
 :::
 :::
+
+
+## MCMC Methods: Comparison
+
+| Feature                    | **Metropolis(-Hastings)**          | **Gibbs Sampling**                        | **Hamiltonian Monte Carlo (HMC)**        |
+|----------------------------|------------------------------------|-------------------------------------------|------------------------------------------|
+| How it works               | Try random moves, accept/reject    | Update one parameter at a time            | Simulate smooth movement using gradients |
+| Efficient in high dimensions? | ❌ Often slow                   | ✅ If math is simple                       | ✅ Very efficient                         |
+| Flexible?                  | ✅ Yes                             | ❌ No (conjugate priors)                   | ✅ Yes                                    |
+| Typical software           | JAGS, custom R                     | JAGS, BUGS                                | Stan, brms, cmdstanr                      |
+
+
+## Stan: A modern language for Bayesian modeling
 
 
 
