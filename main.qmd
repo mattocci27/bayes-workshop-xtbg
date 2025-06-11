@@ -1688,10 +1688,41 @@ p4_ani <- animate(
 | Typical software           | JAGS, custom R                     | JAGS, BUGS                                | Stan, brms, cmdstanr                      |
 
 
-## Stan: A modern language for Bayesian modeling
+## Stan: A modern language/software for Bayesian modeling
+
+::: columns
+
+::: {.column width=40%}
+
+<img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo.png" width=250 alt="Stan Logo"/>
 
 
+```{stan, output.var="bernoulli",file=here('stan/bernoulli.stan'), eval=FALSE, echo=TRUE}
+```
 
+
+:::
+
+::: {.column width=60%}
+
+::: incremental
+
+- 🧑🏻‍💻 **Bayesian Modeling**
+
+  - Stan uses the No-U-Turn sampler (NUTS), a variant of Hamiltonian Monte Carlo (HMC), which is efficient for complex models with many parameters.
+
+- ⚙️ **Flexible and Scalable**
+
+  - You can use Stan for many types of models, from simple regressions to multi-level models including time-series, spatial, SEM, and more.
+
+- 💻 **Multiplatform**
+
+  - Stan works with R, Python, Julia, and more.
+  It also has tools for checking models and making visualizations.
+
+:::
+:::
+:::
 
 # Multilevel model
 
