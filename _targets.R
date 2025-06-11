@@ -4,9 +4,11 @@ library(tidyverse)
 library(stantargets)
 library(cmdstanr)
 library(furrr)
+library(clustermq)
 
 
 source("R/functions.R")
+source("R/mh.R")
 source("R/hmc.R")
 
 # parallel computing on local or on the same node
@@ -23,6 +25,7 @@ tar_option_set(packages = c(
   "janitor",
   "showtext",
   "animation",
+  "gganimate",
   "loo"
 ))
 
@@ -56,8 +59,34 @@ list(
     generate_leapfrog_list()
   ),
   tar_target(
+    mh_df,
+    generate_mh_df()
+  ),
+  tar_target(
+    mh_trace_gif,
+    make_mh_trace_gif(mh_df, out = "images/mh_trace.gif"),
+    format = "file"
+  ),
+  tar_target(
+    mh_post_gif,
+    make_mh_post_gif(mh_df, out = "images/mh_post.gif"),
+    format = "file"
+  ),
+  tar_target(
     leapfrog_gif,
-    make_leapfrog_gif(leapfrog_list, out = "hoge.gif"),
+    make_leapfrog_gif(leapfrog_list, out = "images/leapfrog.gif"),
+    format = "file"
+  ),
+  tar_target(
+    hmc_df,
+    generate_hmc_df(T = 10000)
+  ),
+  tar_target(
+    hmc_gif,
+    make_hmc_gif(
+      data = leapfrog_list$cont_dat,
+      sim_res = hmc_df,
+      out = "images/hmc.gif"),
     format = "file"
   ),
   # tar_quarto(

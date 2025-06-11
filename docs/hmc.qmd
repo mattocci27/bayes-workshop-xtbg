@@ -337,7 +337,7 @@ step2 <- step2 %>%
   mutate(gr3 = as.factor(gr3))
 
 plt1 <- ggplot(step, aes(x = theta, y = p, gr = gr)) +
-  geom_contour(data = data,
+  geom_contour(data = cont_dat,
                aes(x = theta, y = p, z = hamiltonian),
                bins = 50,
                lwd = 0.2) +
@@ -470,7 +470,7 @@ Hplt5_frame <- function(n_iter, n_burn, data, sim_res) {
 ```{r, eval = F}
 
 system.time(saveGIF(
-       lapply(1:200, function(x)Hplt5_frame(x, 50, cont_dat, sim_res)),
+       lapply(1:1000, function(x)Hplt5_frame(x, 50, cont_dat, sim_res)),
        interval = 0.05,
        ani.width = 480,
        ani.height = 240,

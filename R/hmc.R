@@ -85,7 +85,6 @@ generate_contour_data <- function(shape = 11, rate = 13) {
 }
 
 
-
 # cont_dat <- generate_contour_data()
 # shape <- 11
 # rate <- 13
@@ -100,7 +99,7 @@ generate_contour_data <- function(shape = 11, rate = 13) {
 
 # leapfrog_list <- generate_leapfrog_list()
 
-generate_leapfrog_list <- function(theta = 2.5, shape = 11, rate = 13, p = 0, eps = 0.05, T = 15, L = 100, stlide = 1, seed = 123) {
+generate_leapfrog_list <- function(theta = 2.5, shape = 11, rate = 13, p = 0, eps = 0.01, T = 15, L = 100, stlide = 1, seed = 123) {
   set.seed(seed)
 
   step <- NULL
@@ -150,7 +149,7 @@ generate_leapfrog_frame <- function(n, data, step, step2) {
       filter(gr3 %in% step_n$gr)
 
     plt1 <- ggplot(step_n) +
-      geom_point(data = step_n, aes(x = theta, y = p)) +
+      geom_point(data = step_n, aes(x = theta, y = p), size = 4) +
       geom_contour(data = data,
                    aes(x = theta, y = p, z = hamiltonian),
                    bins = 50,
@@ -160,275 +159,107 @@ generate_leapfrog_frame <- function(n, data, step, step2) {
                 col = "red") +
       geom_path(aes(x = theta, y = p, group = gr), lty = 2) +
       coord_cartesian(xlim = c(-0.2, 3.5),
-                      ylim = c(-5, 5))
+                      ylim = c(-5, 5)) +
+      theme_bw(base_size = 28)
     print(plt1)
  }
 
+
 make_leapfrog_gif <- function(leapfrog_list, out) {
+  outdir <- dirname(out)
+  fname  <- basename(out)
+
   saveGIF(
     lapply(seq_len(nrow(leapfrog_list$step)),
            function(i) generate_leapfrog_frame(i, leapfrog_list$cont_dat, leapfrog_list$step, leapfrog_list$step2)),
     interval   = 0.05,
-    ani.width  = 480,
-    ani.height = 240,
-    movie.name = out
+    ani.width  = 600,
+    ani.height = 400,
+    movie.name = fname
   )
-  out
+
+  file.rename(fname, out)
+  paste(out)
 }
 
-# Hplt4_frame(10, leapfrog_list$cont_dat, leapfrog_list$step, leapfrog_list$step2)
+# make_leapfrog_gif(leapfrog_list, out = "images/leapfrog.gif")
 
-# # Leaffrog transition
-# set.seed(123)
+generate_hmc_df <- function(theta = 2.5, shape = 11, rate = 13, p = 0, eps = 0.01, T = 15, L = 100, stlide = 1, seed = 123) {
+  set.seed(seed)
+  scale_p <- 1
 
-# theta <- 2.5
-# eps <- 0.01
-# T <- 15
-# scale_p <- 1
-# prev_p <- 0
-# L <- 96
-# step <- NULL
-# step2 <- NULL
+  # initial param
+  p <- rnorm(1, 0, scale_p)
+  prev_hamiltonian <- hamiltonian(p, theta, shape, rate)
+  sim_res <- c(p, theta, prev_hamiltonian, TRUE)
 
+  for (t in 1:T){
+    prev_p <- p
+    prev_theta <- theta
+    prev_hamiltonian <- hamiltonian(p, theta, shape, rate)
+      for (i in 1:L) {
+        p <- leapfrog_nexthalf_p(p, theta, shape, rate, eps = eps)
+        theta <- leapfrog_next_theta(p, theta, eps = eps)
+        p <- leapfrog_nexthalf_p(p, theta, shape, rate, eps = eps)
+      }
+    H <- hamiltonian(p, theta, shape, rate)
+    r <- exp(prev_hamiltonian - H)
+    if (r > 1) {
+      sim_res <- rbind(sim_res, c(p, theta, prev_hamiltonian, TRUE))
+    } else if (r > 0 & runif(1) < r) {
+      sim_res <- rbind(sim_res, c(p, theta, prev_hamiltonian, TRUE))
+    } else {
+      sim_res <- rbind(sim_res, c(p, theta, prev_hamiltonian, FALSE))
+      theta <- prev_theta
+    }
+    p <- rnorm(1, 0, scale_p)
+  }
 
-# Hplt4_frame <- function(n, data, step, step2) {
-#   step_n <- step %>%
-#     filter(row_number() <= n)
-#   step2_n <- step2 %>%
-#     filter(gr3 %in% step_n$gr)
-#   plt1 <- ggplot(step_n) +
-#     geom_point(data = step_n, aes(x = theta, y = p)) +
-#     geom_contour(data = data,
-#                  aes(x = theta, y = p, z = hamiltonian),
-#                  bins = 50,
-#                  lwd = 0.2) +
-#     geom_line(data = step2_n,
-#               aes(x = theta, y = p, group = gr3),
-#               col = "red") +
-#     geom_path(aes(x = theta, y = p, group = gr), lty = 2) +
-#     coord_cartesian(xlim = c(-0.2, 3.5),
-#                     ylim = c(-5, 5))
-#   print(plt1)
-# }
+  colnames(sim_res) <- c("p", "theta", "hamiltonian", "accept")
+  rownames(sim_res) <- NULL
 
-# system.time(saveGIF(
-#        lapply(1:nrow(step), function(x)Hplt4_frame(x, cont_dat, step, step2)),
-#        interval = 0.05,
-#        ani.width = 480,
-#        ani.height = 240,
-#        movie.name = "./Hplt4.gif"
-#         ))
+  as.data.frame(sim_res) |> as_tibble()
+}
 
 
-# # initial param
-# theta <- 0.1
-# p <- 0
-# eps <- 0.01
-# L <- 200
-# shape <- 11
-# rate <- 13
+generate_hmc_frame <- function(n_iter, n_burn, data, sim_res) {
+  sim_res_n <- sim_res %>%
+    filter(row_number() <= n_iter) %>%
+    mutate(burn = ifelse(row_number() <= n_burn,
+                         "discard",
+                         "keep"))
+  plt1 <- ggplot(sim_res_n) +
+    geom_contour(data = data,
+                 aes(x = theta, y = p, z = hamiltonian),
+                 bins = 50,
+                 lwd = 0.2) +
+    geom_path(data = sim_res_n,
+              aes(x = theta, y = p),
+              col = "#2E7D32",
+              lwd = 0.2) +
+    geom_point(data = sim_res_n, aes(x = theta, y = p, shape = burn), size = 4) +
+    scale_shape_manual(values = c(1, 16)) +
+    coord_cartesian(xlim = c(-0.2, 3.5),
+                    ylim = c(-5, 5)) +
+    theme_bw(base_size = 28) +
+    theme(legend.position = "none")
+  print(plt1)
+}
 
 
-# res <- move_one_step(theta, shape, rate, p, eps = eps, L = L)
+make_hmc_gif <- function(n_iter = 200, n_burn = 50, data, sim_res, out) {
+  outdir <- dirname(out)
+  fname  <- basename(out)
 
-# xx <- seq(-5, 5, length = 200)
-# yy <- seq(0.01, 3, length = 200)
-# xy <- expand.grid(xx, yy)
+  saveGIF(
+    lapply(seq_len(n_iter),
+           function(i) generate_hmc_frame(i, n_burn, data, sim_res)),
+    interval   = 0.05,
+    ani.width  = 600,
+    ani.height = 400,
+    movie.name = fname
+  )
 
-# zz <- hamiltonian(p = xy$Var1, theta = xy$Var2, shape  = shape, rate = rate)
-
-# cont_dat <- data_frame(p = xy$Var1,
-#                        theta = xy$Var2,
-#                        hamiltonian = zz)
-
-# # ggplot(cont_dat) +
-# #   geom_point(data = res, aes(x = theta, y = p)) +
-# #   geom_contour(aes(x = theta, y = p, z = hamiltonian),
-# #                bins = 50,
-# #                lwd = 0.2) #+
-# #   #coord_cartesian(xlim = c(-0.1, 3),
-# #   #                ylim = c(-4, 4))
-
-
-# Hplt2_frame <- function(n, data, res) {
-#   n <- n * 2
-#   pt_dat <- res %>%
-#    slice(n)
-#   plt <- ggplot(data) +
-#     geom_point(data = pt_dat, aes(x = theta, y = p)) +
-#     geom_contour(aes(x = theta, y = p, z = hamiltonian),
-#                  bins = 50,
-#                  lwd = 0.2) +
-#     coord_cartesian(xlim = c(-0.2, 3.5)) +
-#     theme_light()
-#   #print(plt)
-#   plt
-# }
-
-# # saveGIF(
-# #        lapply(1:100, function(x)Hplt2_frame(x, cont_dat, res)),
-# #       #  interval = 0.05,
-# #        ani.width = 480,
-# #        ani.height = 240,
-# #        movie.name = "./Hplt2.gif"
-# #         )
-# # p_eng <- function(H, h){
-# #   sqrt(2 * (H - h))
-# # }
-
-# h_dat2 <- tibble(h = pot_eng(res$theta, shape = shape, rate = rate),
-#                      theta = res$theta) %>%
-#   mutate(p = p_eng(max(h), h)) %>%
-#   mutate(hamiltonian = h + 0.5 * p^2) %>%
-#   mutate(theta_diff = theta - c(0, theta)[-201]) %>%
-#   mutate(p = ifelse(theta_diff > 0, p, -p))
-# # — your existing data and functions —
-# # assume you already have `res`, `cont_dat`, and `h_dat2` from your leapfrog
-
-# # only the first 100 steps:
-# n_max <- 100
-# traj <- h_dat2 %>% slice(1:n_max) %>% mutate(frame = row_number())
-# phase <- res    %>% slice(1:n_max) %>% mutate(frame = row_number())
-
-# # static potential‐energy curve:
-# h_dat <- tibble(
-#   theta = seq(0.01, 3, length = 200),
-#   h     = pot_eng(theta, shape, rate)
-# )
-
-# h_dat3 <- h_dat2 %>%
-#  arrange(desc(theta)) %>%
-#  mutate(p = -p)
-
-# h_dat4 <- bind_rows(h_dat2, h_dat3) %>%
-#  mutate(hamiltonian = h + 0.5 * p^2)
-
-# Hplt1_frame <- function(n, data) {
-#   n <- n * 2
-#   data_n <- data %>%
-#     slice(n)
-#   plt <- ggplot(data, aes(x = theta, y = h)) +
-#     geom_line() +
-#     geom_point(data = data_n,
-#                     aes(x = theta, y = h),
-#                     col = "blue") +
-#     geom_segment(data = data_n,
-#                   aes(x = theta,
-#                       xend = ifelse(p > 0,
-#                                     theta + exp(p)/100,
-#                                     theta - exp(-p)/100),
-#                       y = h, yend = h),
-#                   col = "blue",
-#                   arrow = arrow(length = unit(0.01, "npc"))) +
-#     coord_cartesian(xlim = c(-0.2, 3.5)) +
-#     theme_light()
-#   #print(plt)
-#   plt
-# }
-
-# Hplt3_frame <- function(n, data1, data2, res) {
-#     p1 <- Hplt1_frame(n, data1)
-#     p2 <- Hplt2_frame(n, data2, res)
-#     p3 <- plot_grid(p1, p2, nrow = 2, align = "v")
-#     print(p3)
-# }
-
-
-# saveGIF(
-#        lapply(1:100, function(x) Hplt1_frame(x, h_dat2)),
-#       #  ani.width = 480,
-#       #  ani.height = 240,
-#       #  fps = 20,
-#        movie.name = "./Hplt1.gif"
-#         )
-# system.time(saveGIF(
-#        lapply(1:100, function(x)Hplt3_frame(x, h_dat2, cont_dat, res)),
-#        interval = 0.05,
-#        ani.width = 480,
-#        ani.height = 480,
-#        movie.name = "./Hplt3.gif"
-#         ))
-
-# #
-
-# hamiltonian(p = 3, theta = 1, shape = 11, rate = 13)
-
-
-
-
-# # HMC
-# set.seed(1234)
-# scale_p <- 1
-
-# # initial param
-# theta <- 2.5
-# p <- rnorm(1, 0, scale_p)
-# eps <- 0.01
-# L <- 100
-# T <- 10000
-# prev_hamiltonian <- hamiltonian(p, theta, shape, rate)
-# sim_res <- c(p, theta, prev_hamiltonian, TRUE)
-
-# for (t in 1:T){
-#   prev_p <- p
-#   prev_theta <- theta
-#   prev_hamiltonian <- hamiltonian(p, theta, shape, rate)
-#     for (i in 1:L) {
-#       p <- leapfrog_nexthalf_p(p, theta, shape, rate, eps = eps)
-#       theta <- leapfrog_next_theta(p, theta, eps = eps)
-#       p <- leapfrog_nexthalf_p(p, theta, shape, rate, eps = eps)
-#     }
-#   H <- hamiltonian(p, theta, shape, rate)
-#   r <- exp(prev_hamiltonian - H)
-#   if (r > 1) {
-#     sim_res <- rbind(sim_res, c(p, theta, prev_hamiltonian, TRUE))
-#   } else if (r > 0 & runif(1) < r) {
-#     sim_res <- rbind(sim_res, c(p, theta, prev_hamiltonian, TRUE))
-#   } else {
-#     sim_res <- rbind(sim_res, c(p, theta, prev_hamiltonian, FALSE))
-#     theta <- prev_theta
-#   }
-#   p <- rnorm(1, 0, scale_p)
-# }
-
-
-# res_dat <- as_data_frame(sim_res) %>%
-#   rename(p = V1,
-#          theta = V2,
-#          hamiltonian = V3,
-#          accept = V4)
-
-
-
-# Hplt5_frame <- function(n_iter, n_burn, data, sim_res) {
-#   sim_res_n <- res_dat %>%
-#     filter(row_number() <= n_iter) %>%
-#     mutate(burn = ifelse(row_number() <= n_burn,
-#                          "discard",
-#                          "keep"))
-#   plt1 <- ggplot(sim_res_n) +
-#     geom_contour(data = data,
-#                  aes(x = theta, y = p, z = hamiltonian),
-#                  bins = 50,
-#                  lwd = 0.2) +
-#     geom_path(data = sim_res_n,
-#               aes(x = theta, y = p),
-#               col = "#2E7D32",
-#               size = 0.2) +
-#     geom_point(data = sim_res_n, aes(x = theta, y = p, shape = burn)) +
-#     scale_shape_manual(values = c(1, 16)) +
-#     #geom_point(data = sim_res_n, aes(x = theta, y = p)) +
-#     coord_cartesian(xlim = c(-0.2, 3.5),
-#                     ylim = c(-5, 5))
-#   print(plt1)
-# }
-
-
-
-# system.time(saveGIF(
-#        lapply(1:200, function(x)Hplt5_frame(x, 50, cont_dat, sim_res)),
-#        interval = 0.05,
-#        ani.width = 480,
-#        ani.height = 240,
-#        movie.name = "./Hplt5.gif"
-#         ))
+  file.rename(fname, out)
+  paste(out)
+}

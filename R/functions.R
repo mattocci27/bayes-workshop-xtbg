@@ -55,3 +55,43 @@ add_p <- function(dummy_simple, summary) {
   dummy_simple |>
     mutate(p_bayes = p)
 }
+
+#' @title ggsave for targets
+#' @inheritParams ggplot2::ggsave
+my_ggsave <- function(filename, plot, units = c("in", "cm",
+        "mm", "px"), height = NA, width = NA, dpi = 600, ...) {
+  font_add_google("STIX Two Text", "STIX2")
+  showtext_auto()
+  showtext_opts(dpi = dpi)
+
+  ggsave(
+    filename = paste0(filename, ".png"),
+    plot = plot,
+    height = height,
+    width = width,
+    units = units,
+    dpi = dpi,
+    ...
+  )
+  ggsave(
+    filename = paste0(filename, ".tiff"),
+    plot = plot,
+    height = height,
+    width = width,
+    units = units,
+    dpi = dpi,
+    compression = "lzw",
+    ...
+  )
+  # showtext_auto(FALSE)
+  ggsave(
+    filename = paste0(filename, ".pdf"),
+    plot = plot,
+    height = height,
+    width = width,
+    units = units,
+    dpi = dpi,
+    ...
+  )
+  str_c(filename, c(".png", ".pdf", ".tiff"))
+}
