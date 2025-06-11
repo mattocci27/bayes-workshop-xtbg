@@ -1162,8 +1162,7 @@ mcmc_trace(draws_array, n_warmup = 0, facet_args = list(nrow = 3)) +
 
 - Basic idea of MCMC
 - Stan: A modern language for Bayesian modeling
-- Interefaces to Stan
-- Other tools for Bayesian modeling
+- Interfaces to Stan
 
 ## MCMC (Markov Chain Monte Carlo)
 
@@ -1724,39 +1723,67 @@ p4_ani <- animate(
 :::
 :::
 
-# Multilevel model
 
-## Baseball statistics
+## Interfaces to Stan (for R users)
+
+- Stan: The acutal modeling and inference engine, written in C++.
+
+::: incremental
+
+- CmdStan: Command line interface (you write Stan code and run it via terminal).
+
+- `rstan`, `cmdstanr`: R interface to Stan/Cmdstan (you write Stan code and run it within R).
+
+- `brms`, `rstanarm`: Higher-level R packages that depend on `rstan` (you write R code and run models within R, without writing Stan code).
+
+- In this course, we will use `cmdstanr` and `brms`.
+
+:::
 
 ::: footer
-https://www.mlb.com/stats/batting-average
+CmdStan uses the latest version of Stan, whereas `rstan` is based on an older version.
 :::
 
-<img src="images/baseball.png" width =100% style="display: block; margin: auto;"/>
+# Bayesian Estimation of Simple Models
 
-::: notes
-- batting average estimates
-:::
 
-## Eight school problem
+# Multilevel model
+
+<!-- ## Eight school problem
+
+Coaching effects in eight schools.
+
+| School | Estimated treatment effect, $y_j$ | Standard error of effect estimate, $\sigma_j$|
+|--------|----------------------------------------|---------------------------------------------------|
+| A      | 28                                     | 15                                                |
+| B      | 8                                      | 10                                                |
+| C      | −3                                     | 16                                                |
+| D      | 7                                      | 11                                                |
+| E      | −1                                     | 9                                                 |
+| F      | 1                                      | 11                                                |
+| G      | 18                                     | 10                                                |
+| H      | 12                                     | 18                                                |
+
+- What is the average effect of coaching?
+- What is the average effect of coaching?
 
 ::: footer
 [1] Rubin, D. B. Estimation in parallel randomized experiments. Journal of Educational Statistics 6, 377–401 (1981).
 
 [2] Gelman, A. et al. Bayesian Data Analysis, Third Edition. (Chapman & Hall/CRC, 2013).
-:::
+::: -->
 
-![](images/eight_schools.png)
+<!-- ![](images/eight_schools.png) -->
 
-::: notes
+<!-- ::: notes
 - S A T
 - data has 8 rows with mean effects and SD of the effects
 - not straightforward
 :::
 
----
+--- -->
 
-## Eight species problem
+## Eight mother trees problem
 
 ::: footer
 Newly developed example
@@ -1767,9 +1794,10 @@ What is the survival rate?
 ::: columns
 ::: {.column width="30%"}
 ```{r}
-dummy_simple <- targets::tar_read(dummy_simple)
+dummy_simple <- targets::tar_read(dummy_simple) |>
+  rename(id = sp)
 dummy_simple |>
-  dplyr::select(sp:suv) |>
+  dplyr::select(id:suv) |>
   knitr::kable(format = "html") |>
   kable_material(c("striped", "hover"), full_width = FALSE)
 ```
@@ -1808,16 +1836,17 @@ suv_pool <- sum(dummy_simple$suv) / sum(dummy_simple$n)
 ---
 
 
-## Eight species problem (separate estimates)
+## Eight mother trees problem (separate estimates)
 
 What is the survival rate?
 
 ::: columns
 ::: {.column width="35%"}
 ```{r}
-dummy_simple <- tar_read(dummy_simple)
+dummy_simple <- tar_read(dummy_simple) |>
+  rename(id = sp)
 dummy_simple |>
-  dplyr::select(sp:suv, p_like) |>
+  dplyr::select(id:suv, p_like) |>
   knitr::kable(format = "html") |>
   kable_material(c("striped", "hover"), full_width = FALSE)
 ```
@@ -1834,7 +1863,7 @@ dummy_simple |>
 
 ---
 
-## Eight species problem (separate estimates)
+## Eight mother trees problem (separate estimates)
 
 What is the survival rate?
 
@@ -1888,27 +1917,33 @@ We know `p_true` because we generated this data using `p_true` as a known parame
 
 ---
 
-## Two extreme cases (pooled estimates)
+## Extreme case 1: Pooled estimates
 
-- $S_i \sim \mathcal{B}(N_i, p)$
+- $S_i \sim \mathcal{B}(N_i, p)$: Likelihood
+- $\mathrm{logit}(p) \sim \mathcal{N}(0, 2.5)$: Prior
 
 ![](images/pool.png)
 <!-- <img src="images/pool.png" width="60%" style="display: block; margin: auto;"/> -->
 
 ::: incremental
-- This model doesn't consider the variation among species
+- This model assumes all mother trees share the exact same survival rate.
 :::
 
 ---
 
-## Two extreme cases (separate estimates)
+## Extreme case 2: Separate estimates
 
-- $S_i \sim \mathcal{B}(N_i, p_i)$
+- $S_i \sim \mathcal{B}(N_i, p_i)$: Likelihood
+- $\mathrm{logit}(p_i) \sim \mathcal{N}(0, 2.5)$: Prior
 
 ![](images/separate.png)
 <!-- <img src="images/separate.png" width="60%" style="display: block; margin: auto;"/> -->
 
-- This model assumes that survival rates are 100% independent among species
+::: incremental
+- This model assumes each mother tree has a completely independent survival rate.
+- With limited data per tree, this model tends to overfit and produces noisy estimates.
+- We need to find a balance between these two extremes.
+:::
 
 ::: notes
 - if we have infinite amount of data, we can estimate survival rates separately
@@ -1918,20 +1953,24 @@ We know `p_true` because we generated this data using `p_true` as a known parame
 
 ---
 
-## More realistic estimates (multilevel models)
+## More realistic estimates: Multilevel models
 
-- $S_i \sim \mathcal{B}(N_i, p_i)$
+- $S_i \sim \mathcal{B}(N_i, p_i)$: Likelihood
 
-- $z_i \sim \mathcal{N}(\mu, \sigma)$ where $z_i = \mathrm{logit}(p_i) = \mathrm{log}\frac{p_i}{1 - p_i}$
+- $\mathrm{logit}(p_i) \sim \mathcal{N}(\mu, \sigma)$: Hierarchical prior
+
+- $\mu \sim \mathcal{N}(0, 2.5)$: Hyperprior
+
+- $\sigma \sim \text{Half-Cauchy}(0, 1)$: Hyperprior
 
 <!-- ![](images/multilevel.png) -->
 <img src="images/multilevel.png" width="80%" style="display: block; margin: auto;"/>
 
 ---
 
-## $\sigma$ determines species variation
+## $\sigma$ determines group-level variation
 
-The overall survival rate is 0.5 in this example.
+The overall survival rate is 0.5 in this figure.
 We have some sense of a scale for $\sigma$.
 
 ::: columns
