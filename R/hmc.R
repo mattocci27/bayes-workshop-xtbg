@@ -142,6 +142,103 @@ generate_leapfrog_list <- function(theta = 2.5, shape = 11, rate = 13, p = 0, ep
   )
 }
 
+generate_simple_hmc_list <- function(theta = 0.1, shape = 11, rate = 13, p = 0, eps = 0.01, L = 200) {
+  # theta <- 2.5
+# theta <- 0.1
+# p <- 0
+# eps <- 0.01
+# L <- 200
+# shape <- 11
+# rate <- 13
+
+  # dh_dtheta(theta, shape, rate)
+  # hamiltonian(p, theta, shape, rate)
+  # leapfrog_nexthalf_p(p, theta, shape, rate, eps)
+  # leapfrog_next_theta(p, theta, eps)
+  cont_df <- generate_contour_data(shape, rate)
+
+  new_hm <- move_one_step(theta = theta, shape = shape, rate = rate, p = p, eps = eps, L = L)
+
+  hmc_df <- tibble(h = pot_eng(new_hm$theta, shape = shape, rate = rate),
+                       theta = new_hm$theta) %>%
+    mutate(p = p_eng(max(h), h)) %>%
+    mutate(hamiltonian = h + 0.5 * p^2) %>%
+    mutate(theta_diff = theta - c(0, theta)[-201]) %>%
+    mutate(p = ifelse(theta_diff > 0, p, -p))
+
+  list(
+    new_hm = new_hm,
+    hmc_df = hmc_df,
+    cont_df = cont_df
+  )
+}
+
+
+make_pot_eng_gif <- function(simple_hmc_list, n_max = 200, width = 600, height = 400, out) {
+  outdir <- dirname(out)
+  fname  <- basename(out)
+  df <- simple_hmc_list$hmc_df
+
+  anim_df <- df %>%
+  slice(1:n_max) %>%
+  mutate(frame = row_number())
+
+  p <- ggplot(anim_df, aes(x = theta, y = h)) +
+    geom_line(data = df, aes(x = theta, y = h)) +
+    geom_point(color = "blue", size = 4) +
+    geom_segment(
+      aes(
+        x    = theta,
+        xend = ifelse(p > 0,
+                      theta + exp(p)/100,
+                      theta - exp(-p)/100),
+        y    = h,
+        yend = h
+      ),
+      arrow = arrow(length = unit(0.05, "npc")),
+      color = "blue"
+    ) +
+    coord_cartesian(xlim = c(-0.2, 3.5)) +
+    theme_bw(base_size = 28) +
+    # labs(title = "Potential energy (h) — fr") +
+    transition_reveal(frame)
+
+  animate(p, nframes = nrow(df), fps = 40,
+        width = width, height = height,
+        renderer = gifski_renderer(fname))
+  file.rename(fname, out)
+  paste(out)
+
+}
+
+make_traj_gif <- function(simple_hmc_list, n_max = 200, width = 600, height = 400, out) {
+  outdir <- dirname(out)
+  fname  <- basename(out)
+  df <- simple_hmc_list$new_hm
+  anim_df <- df %>%
+    slice(1:n_max) %>%
+    mutate(frame = row_number())
+
+  p <- ggplot(simple_hmc_list$cont_df, aes(x = theta, y = p)) +
+    geom_contour(aes(z = hamiltonian),
+                 bins = 50, lwd = 0.2) +
+    geom_point(data = anim_df,
+               aes(x = theta, y = p),
+               color = "red", size = 4) +
+    coord_cartesian(xlim = c(-0.2, 3.5),
+                    ylim = c(min(df$p), max(df$p))) +
+    theme_bw(base_size = 28) +
+    ylab("r") +
+    # labs(title = "Phase space (p vs θ) — frame {current_frame}") +
+    transition_reveal(frame)
+
+  animate(p, nframes = nrow(df), fps = 40,
+        width = width, height = height,
+        renderer = gifski_renderer(fname))
+  file.rename(fname, out)
+  paste(out)
+
+}
 generate_leapfrog_frame <- function(n, data, step, step2) {
     step_n <- step %>%
       filter(row_number() <= n)

@@ -55,10 +55,6 @@ list(
     add_p(dummy_simple, simple_summary_logistic)
   ),
   tar_target(
-    leapfrog_list,
-    generate_leapfrog_list()
-  ),
-  tar_target(
     mh_df,
     generate_mh_df()
   ),
@@ -70,6 +66,24 @@ list(
   tar_target(
     mh_post_gif,
     make_mh_post_gif(mh_df, out = "images/mh_post.gif"),
+    format = "file"
+  ),
+  tar_target(
+    leapfrog_list,
+    generate_leapfrog_list()
+  ),
+  tar_target(
+    simple_hmc_list,
+    generate_simple_hmc_list()
+  ),
+  tar_target(
+    pot_eng_gif,
+    make_pot_eng_gif(simple_hmc_list, out = "images/pot_eng.gif"),
+    format = "file"
+  ),
+  tar_target(
+    traj_gif,
+    make_traj_gif(simple_hmc_list, out = "images/traj.gif"),
     format = "file"
   ),
   tar_target(

@@ -330,8 +330,8 @@
 </div>
 </div><div class="column" style="width:60%;">
 <ul>
-<li class="fragment"><p>A likelihood function is a probability function that shows how likely it is to observe the data for a specific set of parameters.</p></li>
-<li class="fragment"><p>e.g., when your model is <span class="math inline">\(x \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)\)</span> (normal distribution with mean 0 and variance 1), what is the probability density at x = 1.96?</p></li>
+<li class="fragment"><p><strong>P(data | parameters)</strong>: Probability of observing the data given the parameters.</p></li>
+<li class="fragment"><p>e.g., when your model is <span class="math inline">\(x_i \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)\)</span> (normal distribution with mean 0 and variance 1), what is the probability density at x = 1.96?</p></li>
 </ul>
 <div class="fragment">
 <div class="cell" data-layout-align="center">
@@ -403,9 +403,9 @@
 <section id="likelihood-2" class="slide level2">
 <h2>Likelihood</h2>
 <ul>
-<li><p>Because we usually don’t know the true parameters (<span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>), we need to find the parameters that maximize the likelihood function (<strong>Maximum Likelihood Estimation</strong>).</p>
+<li class="fragment"><p>Because we usually don’t know the true parameters (<span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>), we need to find the parameters that maximize the likelihood function (<strong>MLE: Maximum Likelihood Estimation</strong>).</p>
 <ul>
-<li>e.g., for a liner model <span class="math inline">\(y = ax + b\)</span>, we usually assume that <span class="math inline">\(y \sim \mathcal{N}(\mu = ax + b, \sigma^2)\)</span>, and we want to find the parameters <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, and <span class="math inline">\(\sigma\)</span> that maximize the likelihood function: <span class="math inline">\(P(y \mid ax + b, \sigma)\)</span></li>
+<li class="fragment">e.g., for a liner model <span class="math inline">\(y_i = ax_i + b\)</span>, we usually assume that <span class="math inline">\(y_i \sim \mathcal{N}(\mu_i = ax_i + b, \sigma^2)\)</span>, and we want to find the parameters <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, and <span class="math inline">\(\sigma\)</span> that maximize the likelihood function: <span class="math inline">\(P(y_i \mid ax_i + b, \sigma)\)</span></li>
 </ul></li>
 </ul>
 </section>
@@ -422,12 +422,10 @@
 <li class="fragment"><p><span class="math inline">\(p\)</span>: survival rates, <span class="math inline">\(1-p\)</span>: mortality rate</p></li>
 <li class="fragment"><p><span class="math inline">\(L = {}_5C_2 p^2(1-p)^3\)</span> (Binomial distribution)</p></li>
 <li class="fragment"><p><span class="math inline">\(\mathrm{ln}\;L = \mathrm{ln}\;{}_5C_2 + 2\mathrm{ln}\;p + 3\mathrm{ln}(1-p)\)</span></p></li>
-<li class="fragment"><p><span class="math inline">\(p = \frac{2}{5}\)</span></p></li>
+<li class="fragment"><p><span class="math inline">\(\frac{d}{dp}\mathrm{ln}\;L = \frac{2}{p} - \frac{3}{1-p} = 0\)</span></p></li>
+<li class="fragment"><p>Solve: <span class="math inline">\(p = \frac{2}{5}\)</span></p></li>
 </ul>
 </div></div>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="multilevel-models-conceptual-motivation" class="title-slide slide level1 center">
@@ -458,7 +456,7 @@
 <p>Conspecific density and species abundance are scaled (mean = 0, sd = 1).</p>
 </div>
 <div class="small">
-<p><em>Rare species tend to be rare because they suffer stronger conspecific NDD than common species.</em></p>
+<p><em>H: Rare species tend to be rare because they suffer stronger conspecific NDD than common species.</em></p>
 <div class="fragment">
 <p>There is negative density dependence (NDD) of seedling survival rate, and the strength of NDD varies among species. The strength of NDD depends on species abundance.</p>
 </div>
@@ -469,7 +467,7 @@
 </div>
 <div class="fragment">
 <ul>
-<li>Slopes <em>b</em> ~ species abundance (species-level).</li>
+<li>Slopes <em>a</em> ~ species abundance (species-level).</li>
 </ul>
 </div>
 </div>
@@ -482,7 +480,7 @@
 <p>Wood density is scaled (mean = 0, sd = 1).</p>
 </div>
 <div class="small">
-<p><em>Dense wood can support taller trees than less dense wood.</em></p>
+<p><em>H: Dense wood can support taller trees than less dense wood.</em></p>
 <div class="fragment">
 <p>There is a power-law relationship (<span class="math inline">\(y =ax^b\)</span>) between tree diameter (DBH) and tree maximum height, and the power-law exponent varies among species. Those relationships depend on wood density.</p>
 </div>
@@ -962,6 +960,13 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 \]</span></p>
 </div>
 </div></div>
+</section>
+<section id="summary-priors" class="slide level2">
+<h2>Summary: Priors</h2>
+<ul>
+<li><p>Using weakly informative priors, we don’t have to explore the entire parameter space.</p></li>
+<li><p>Bayesian methods are inherently designed for hierarchical (multilevel) modeling thourgh priors.</p></li>
+</ul>
 </section></section>
 <section>
 <section id="multilevel-model-revisit" class="title-slide slide level1 center">
@@ -996,9 +1001,6 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 </section>
 <section id="eight-mother-trees-problem" class="slide level2">
 <h2>Eight mother trees problem</h2>
-<div class="footer">
-<p>Newly developed example</p>
-</div>
 <p>What is the survival rate?</p>
 <div class="columns">
 <div class="column" style="width:30%;">
@@ -1415,13 +1417,13 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <section id="mcmc-gibbs-sampling" class="slide level2">
 <h2>MCMC: Gibbs sampling</h2>
 <ul>
-<li class="fragment"><p>Sampling <span class="math inline">\(\theta_1\)</span>, <span class="math inline">\(\theta_2\)</span> jointly is hard: <span class="math inline">\(p(\theta_1, \theta_2 \mid data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_1, \theta_2)\)</span></p></li>
+<li class="fragment"><p>Sampling <span class="math inline">\(\theta_1\)</span>, <span class="math inline">\(\theta_2\)</span> jointly is hard: <span class="math inline">\(p(\theta_1, \theta_2 \mid \text{data}) \propto p(\text{data} \mid \theta_1, \theta_2) \times p(\theta_1, \theta_2)\)</span></p></li>
 <li class="fragment"><p>Instead, we sample <span class="math inline">\(\theta_1\)</span> and <span class="math inline">\(\theta_2\)</span> sequentially:</p>
 <ul>
-<li class="fragment"><p><span class="math inline">\(p(\theta_1 \mid \theta_2, data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_1  \mid \theta_2)\)</span></p></li>
-<li class="fragment"><p><span class="math inline">\(p(\theta_2 \mid \theta_1, data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_2  \mid \theta_1)\)</span></p></li>
-<li class="fragment"><p><span class="math inline">\(\theta_1^{(t)} \sim p(\theta_1 \mid \theta^{(t-1)}_2, data)\)</span></p></li>
-<li class="fragment"><p><span class="math inline">\(\theta_2^{(t)} \sim p(\theta_2 \mid \theta^{(t)}_1, data)\)</span></p></li>
+<li class="fragment"><p><span class="math inline">\(p(\theta_1 \mid \theta_2, \text{data}) \propto p(\text{data} \mid \theta_1, \theta_2) \times p(\theta_1  \mid \theta_2)\)</span></p></li>
+<li class="fragment"><p><span class="math inline">\(p(\theta_2 \mid \theta_1, \text{data}) \propto p(\text{data} \mid \theta_1, \theta_2) \times p(\theta_2  \mid \theta_1)\)</span></p></li>
+<li class="fragment"><p><span class="math inline">\(\theta_1^{(t)} \sim p(\theta_1 \mid \theta^{(t-1)}_2, \text{data})\)</span></p></li>
+<li class="fragment"><p><span class="math inline">\(\theta_2^{(t)} \sim p(\theta_2 \mid \theta^{(t)}_1, \text{data})\)</span></p></li>
 </ul></li>
 <li class="fragment"><p>Gibbs sampling approximates the joint posterior by sampling from these full conditionals.</p></li>
 <li class="fragment"><p>Implemented in BUGS and JAGS software</p></li>
@@ -1431,19 +1433,19 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <h2>MCMC: Hamiltonian Monte Carlo (HMC)</h2>
 <div class="columns">
 <div class="column" style="width:40%;">
-<p><img data-src="images/hamiltonian.gif"></p>
-<p><img data-src="images/mcmc_hmc.gif"></p>
+<p><img data-src="images/pot_eng.gif"></p>
+<p><img data-src="images/traj.gif"></p>
 </div><div class="column" style="width:60%;">
 <ul>
-<li><p><span class="math inline">\(H(\theta, p) = h(\theta) + p^2/2\)</span> (Hamitonian: potential energy + kinetic energy = constant)</p></li>
-<li><p>Contour lines of <span class="math inline">\(H(\theta, p)\)</span> in the phase space (<span class="math inline">\(\theta\)</span> vs.&nbsp;<span class="math inline">\(p\)</span>)</p></li>
-<li><p>Instead of sampling from <span class="math inline">\(p(\theta \mid data)\)</span>, HMC samples from a joint distribution over both.</p></li>
+<li><p><span class="math inline">\(H(\theta, r) = U(\theta) + r^2/2\)</span> (Hamitonian: potential energy + kinetic energy = constant)</p></li>
+<li><p>Contour lines of <span class="math inline">\(H(\theta, r)\)</span> in the phase space (<span class="math inline">\(\theta\)</span> vs.&nbsp;<span class="math inline">\(r\)</span>)</p></li>
+<li><p>Instead of sampling from <span class="math inline">\(p(\theta \mid \text{data})\)</span>, HMC samples from a joint distribution over both.</p></li>
 </ul>
 <p><span class="math display">\[
 p(\theta, r) \propto exp(-H(\theta, r))
 \]</span></p>
 <p><span class="math display">\[
-p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
+p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-U(\theta))
 \]</span></p>
 </div></div>
 </section>
@@ -1457,6 +1459,11 @@ p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
 <ul>
 <li>hoge</li>
 </ul>
+<p>Why parameter in the same trajectory is better than random parameters?</p>
+<p>theta in the same trajectory may have the the same <span class="math inline">\(p(\theta \mid data)\)</span> because of this?</p>
+<p><span class="math display">\[
+p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
+\]</span></p>
 </div></div>
 </section>
 <section id="mcmc-methods-comparison" class="slide level2">
@@ -1705,7 +1712,7 @@ p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-37-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-34-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>

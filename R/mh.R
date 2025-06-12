@@ -57,15 +57,6 @@ generate_mh_df <- function(n_iter = 200, init_p1 = 0.2, init_p2 = 0.8, seed = 12
   df
 }
 
-  #     annotate("rect",
-  #          xmin = -Inf,    # from the very left
-  #          xmax =  10,    # up to 100
-  #          ymin = -Inf,    # bottom of panel
-  #          ymax =  Inf,    # top of panel
-  #          fill = "grey80",
-  #          alpha = 0.4
-  # ) +
-
 
 make_mh_trace_gif <- function(df, width = 600, height = 400, out) {
   outdir <- dirname(out)

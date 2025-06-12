@@ -147,9 +147,9 @@ $f(x \mid \mu, \sigma) = \frac{1}{\sqrt{2\pi\sigma^2}}\mathrm{exp} \bigl[{-\frac
 :::
 ::: {.column width=60%}
 ::: incremental
-- A likelihood function is a probability function that shows how likely it is to observe the data for a specific set of parameters.
+- **P(data | parameters)**: Probability of observing the data given the parameters.
 
-- e.g., when your model is $x \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)$ (normal distribution with mean 0 and variance 1), what is the probability density at x = 1.96?
+- e.g., when your model is $x_i \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)$ (normal distribution with mean 0 and variance 1), what is the probability density at x = 1.96?
 :::
 
 ::: fragment
@@ -220,9 +220,11 @@ tibble(x, y) |>
 
 ## Likelihood
 
-- Because we usually don't know the true parameters ($\mu$ and $\sigma$), we need to find the parameters that maximize the likelihood function (**Maximum Likelihood Estimation**).
+::: incremental
+- Because we usually don't know the true parameters ($\mu$ and $\sigma$), we need to find the parameters that maximize the likelihood function (**MLE: Maximum Likelihood Estimation**).
 
-  - e.g., for a liner model $y = ax + b$, we usually assume that $y \sim \mathcal{N}(\mu = ax + b, \sigma^2)$, and we want to find the parameters $a$, $b$, and $\sigma$ that maximize the likelihood function: $P(y \mid ax + b, \sigma)$
+  - e.g., for a liner model $y_i = ax_i + b$, we usually assume that $y_i \sim \mathcal{N}(\mu_i = ax_i + b, \sigma^2)$, and we want to find the parameters $a$, $b$, and $\sigma$ that maximize the likelihood function: $P(y_i \mid ax_i + b, \sigma)$
+:::
 
 ---
 
@@ -244,12 +246,14 @@ tibble(x, y) |>
 
 - $\mathrm{ln}\;L = \mathrm{ln}\;{}_5C_2 + 2\mathrm{ln}\;p + 3\mathrm{ln}(1-p)$
 
-- $p = \frac{2}{5}$
+- $\frac{d}{dp}\mathrm{ln}\;L = \frac{2}{p} - \frac{3}{1-p} = 0$
+
+- Solve: $p = \frac{2}{5}$
+
 :::
 :::
 :::
 
----
 
 # Multilevel Models (Conceptual Motivation)
 
@@ -294,7 +298,7 @@ Conspecific density and species abundance are scaled (mean = 0, sd = 1).
 
 ::: small
 
-*Rare species tend to be rare because they suffer stronger conspecific NDD than common species.*
+*H: Rare species tend to be rare because they suffer stronger conspecific NDD than common species.*
 
 ::: fragment
 There is negative density dependence (NDD) of seedling survival rate, and the strength of NDD varies among species.
@@ -306,11 +310,10 @@ The strength of NDD depends on species abundance.
 :::
 
 ::: fragment
-- Slopes *b* ~ species abundance (species-level).
+- Slopes *a* ~ species abundance (species-level).
 :::
 
 :::
-
 
 
 ```{r, echo=FALSE, fig.width=15, fig.height=5, fig.retina=3}
@@ -378,7 +381,7 @@ Wood density is scaled (mean = 0, sd = 1).
 
 ::: small
 
-*Dense wood can support taller trees than less dense wood.*
+*H: Dense wood can support taller trees than less dense wood.*
 
 ::: fragment
 There is a power-law relationship ($y =ax^b$) between tree diameter (DBH) and tree maximum height, and the power-law exponent varies among species.
@@ -1136,6 +1139,12 @@ $$
 :::
 :::
 
+## Summary: Priors
+
+- Using weakly informative priors, we don't have to explore the entire parameter space.
+
+- Bayesian methods are inherently designed for hierarchical (multilevel) modeling thourgh priors.
+
 # Multilevel model Revisit
 
 ## Eight schools problem
@@ -1161,10 +1170,6 @@ Coaching effects in eight schools.
 ---
 
 ## Eight mother trees problem
-
-::: footer
-Newly developed example
-:::
 
 What is the survival rate?
 
@@ -1508,17 +1513,17 @@ $p = 110/200 = 0.55$
 ::: incremental
 
 - Sampling $\theta_1$, $\theta_2$ jointly is hard:
-$p(\theta_1, \theta_2 \mid data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_1, \theta_2)$
+$p(\theta_1, \theta_2 \mid \text{data}) \propto p(\text{data} \mid \theta_1, \theta_2) \times p(\theta_1, \theta_2)$
 
 - Instead, we sample $\theta_1$ and $\theta_2$ sequentially:
 
-  - $p(\theta_1 \mid \theta_2, data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_1  \mid \theta_2)$
+  - $p(\theta_1 \mid \theta_2, \text{data}) \propto p(\text{data} \mid \theta_1, \theta_2) \times p(\theta_1  \mid \theta_2)$
 
-  - $p(\theta_2 \mid \theta_1, data) \propto p(data \mid \theta_1, \theta_2) \times p(\theta_2  \mid \theta_1)$
+  - $p(\theta_2 \mid \theta_1, \text{data}) \propto p(\text{data} \mid \theta_1, \theta_2) \times p(\theta_2  \mid \theta_1)$
 
-  - $\theta_1^{(t)} \sim p(\theta_1 \mid \theta^{(t-1)}_2, data)$
+  - $\theta_1^{(t)} \sim p(\theta_1 \mid \theta^{(t-1)}_2, \text{data})$
 
-  - $\theta_2^{(t)} \sim p(\theta_2 \mid \theta^{(t)}_1, data)$
+  - $\theta_2^{(t)} \sim p(\theta_2 \mid \theta^{(t)}_1, \text{data})$
 
 - Gibbs sampling approximates the joint posterior by sampling from these full conditionals.
 
@@ -1553,176 +1558,28 @@ ggplot(samples_long, aes(x = iter, y = value, color = param)) +
 
 ## MCMC: Hamiltonian Monte Carlo (HMC)
 
-```{r}
-h <- function(theta, shape, rate) {
-  #-dgamma(theta, shape = shape, rate = rate, log = T)
-  rate * theta - (shape - 1) * log(theta)
-}
-
-dh_dtheta <- function(theta, shape, rate) {
-  rate - (shape - 1) /theta
-}
-
-hamiltonian <- function(p, theta, shape, rate) {
-  h(theta, shape, rate) + 0.5 * p^2
-}
-
-leapfrog_nexthalf_p <- function(p, theta, shape, rate, eps = 0.01) {
-  p - 0.5 * eps * dh_dtheta(theta, shape, rate)
-}
-
-leapfrog_next_theta <- function(p, theta, eps = 0.01) {
-  theta + eps * p
-}
-
-# hamiltonian(p = 3, theta = 1, shape = 11, rate = 13)
-
-move_one_step <- function(theta, shape, rate, p, eps = 0.01, L = 100, stlide = 1) {
-  res <- c(1, p, theta, hamiltonian(p, theta, shape, rate))
-  res2 <- NULL
-  for (i in 1:L) {
-    p <- leapfrog_nexthalf_p(p, theta, shape, rate, eps)
-    theta <- leapfrog_next_theta(p, theta, eps)
-    p <- leapfrog_nexthalf_p(p, theta, shape, rate, eps)
-    res <- c(1, p, theta, hamiltonian(p, theta, shape, rate))
-    res2 <- rbind(res2, res)
-  }
-  res3 <- res2 %>%
-    as_data_frame %>%
-    rename(temp = V1,
-           p = V2,
-           theta = V3,
-           hamiltonian = V4)
-  res3 %>%
-    filter(row_number() %% stlide == 0)
-}
-
-shape <- 11
-rate <- 13
-pot_eng <- function(theta, shape, rate) {
-  rate * theta - (shape - 1) * log(theta)
-}
-
-theta <- seq(0.01, 3, length = 200)
-
-h_dat <- data_frame(h = pot_eng(theta, shape = shape, rate = rate), theta)
-
-# initial param
-theta <- 0.1
-p <- 0
-eps <- 0.01
-L <- 200
-shape <- 11
-rate <- 13
-
-# dh_dtheta(theta, shape, rate)
-# hamiltonian(p, theta, shape, rate)
-# leapfrog_nexthalf_p(p, theta, shape, rate, eps)
-# leapfrog_next_theta(p, theta, eps)
-
-res <- move_one_step(theta, shape, rate, p, eps = eps, L = L)
-
-xx <- seq(-5, 5, length = 200)
-yy <- seq(0.01, 3, length = 200)
-xy <- expand.grid(xx, yy)
-
-zz <- hamiltonian(p = xy$Var1, theta = xy$Var2, shape  = shape, rate = rate)
-
-cont_dat <- tibble(p = xy$Var1,
-                       theta = xy$Var2,
-                       hamiltonian = zz)
-
-p_eng <- function(H, h){
-  sqrt(2 * (H - h))
-}
-
-h_dat2 <- data_frame(h = pot_eng(res$theta, shape = shape, rate = rate),
-                     theta = res$theta) %>%
-  mutate(p = p_eng(max(h), h)) %>%
-  mutate(hamiltonian = h + 0.5 * p^2) %>%
-  mutate(theta_diff = theta - c(0, theta)[-201]) %>%
-  mutate(p = ifelse(theta_diff > 0, p, -p))
-
-
-```
-
-```{r}
-n_max <- 200
-h_dat2_anim <- h_dat2 %>%
-  slice(1:n_max) %>%
-  mutate(frame = row_number())
-
-res_anim <- res %>%
-  slice(1:n_max) %>%
-  mutate(frame = row_number())
-
-# Panel 1: potential energy
-p1 <- ggplot(h_dat2_anim, aes(x = theta, y = h)) +
-  geom_line(data = h_dat2, aes(x = theta, y = h)) +
-  geom_point(color = "blue", size = 4) +
-  geom_segment(
-    aes(
-      x    = theta,
-      xend = ifelse(p > 0,
-                    theta + exp(p)/100,
-                    theta - exp(-p)/100),
-      y    = h,
-      yend = h
-    ),
-    arrow = arrow(length = unit(0.05, "npc")),
-    color = "blue"
-  ) +
-  coord_cartesian(xlim = c(-0.2, 3.5)) +
-  theme_bw(base_size = 28) +
-  # labs(title = "Potential energy (h) — fr") +
-  transition_reveal(frame)
-
-
-# Panel 2: phase space contour + trajectory
-p2 <- ggplot(cont_dat, aes(x = theta, y = p)) +
-  geom_contour(aes(z = hamiltonian),
-               bins = 50, size = 0.2) +
-  geom_point(data = res_anim,
-             aes(x = theta, y = p),
-             color = "red", size = 4) +
-  coord_cartesian(xlim = c(-0.2, 3.5),
-                  ylim = c(min(res$p), max(res$p))) +
-  theme_bw(base_size = 28) +
-  # labs(title = "Phase space (p vs θ) — frame {current_frame}") +
-  transition_reveal(frame)
-
-```
-
-```{r, include=FALSE, eval=FALSE}
-p1_ani <- animate(p1, nframes = n_max, fps = 30, width = 600, height = 400)
-anim_save("images/hamiltonian.gif", animation = p1_ani)
-
-p2_ani <- animate(p2, nframes = n_max, fps = 30, width = 600, height = 400)
-anim_save("images/mcmc_hmc.gif", animation = p2_ani)
-```
-
 ::: columns
 
 ::: {.column width=40%}
-![](images/hamiltonian.gif)
+![](images/pot_eng.gif)
 
-![](images/mcmc_hmc.gif)
+![](images/traj.gif)
 :::
 
 ::: {.column width=60%}
 
-- $H(\theta, p) = h(\theta) + p^2/2$ (Hamitonian: potential energy + kinetic energy = constant)
+- $H(\theta, r) = U(\theta) + r^2/2$ (Hamitonian: potential energy + kinetic energy = constant)
 
-- Contour lines of $H(\theta, p)$ in the phase space ($\theta$ vs. $p$)
+- Contour lines of $H(\theta, r)$ in the phase space ($\theta$ vs. $r$)
 
-- Instead of sampling from $p(\theta \mid data)$, HMC samples from a joint distribution over both.
+- Instead of sampling from $p(\theta \mid \text{data})$, HMC samples from a joint distribution over both.
 
 $$
 p(\theta, r) \propto exp(-H(\theta, r))
 $$
 
 $$
-p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
+p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-U(\theta))
 $$
 
 :::
@@ -1743,6 +1600,14 @@ $$
 ::: {.column width=60%}
 
 - hoge
+
+Why parameter in the same trajectory is better than random parameters?
+
+theta in the same trajectory may have the the same $p(\theta \mid data)$ because of this?
+
+$$
+p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
+$$
 
 :::
 :::
