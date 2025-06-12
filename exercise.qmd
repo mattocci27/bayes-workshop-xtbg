@@ -1,0 +1,215 @@
+---
+title: ""
+author: "Masatoshi Katabuchi"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+fontsize: 12pt
+format:
+  html:
+    theme: coderpro
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    smooth-scroll: true
+    standalone: true
+    embed-resources: true
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  cache = FALSE,
+  fig.align = "center",
+  fig.show = "hold"
+)
+```
+
+
+- Normal model
+
+- Poisson model
+
+- Multiple linear regression
+
+- Varying intercepts
+
+- Varying slopes and intercepts
+
+- Varying slopes and intercepts, and group-level predictors
+
+```{r}
+library(brms)
+library(cmdstanr)
+library(tidyverse)
+library(bayesplot)
+cmdstanr::set_cmdstan_path("/opt/cmdstan/cmdstan-2.36.0")
+```
+
+
+# Normal model
+
+$$
+y_i \sim N(\mu, \sigma)
+$$
+
+## Dummy data
+
+```{r}
+set.seed(123)
+n <- 100
+mu <- 5
+sigma <- 2
+y <- rnorm(n, mean = mu, sd = sigma)
+
+hist(y)
+```
+
+```{r}
+normal_list <- list(
+  y = y,
+  N = length(y)
+)
+
+normal_df <- tibble(
+  y = y,
+  N = length(y)
+)
+```
+
+## Stan
+
+`stan/normal.stan`
+
+```{stan, output.var="normal",file='stan/normal.stan', eval=FALSE, echo=TRUE}
+```
+
+`stan/normal_vague.stan`
+
+```{stan, output.var="normal_vague",file='stan/normal_vague.stan', eval=FALSE, echo=TRUE}
+```
+
+```{r}
+normal_mod <- cmdstan_model("stan/normal.stan")
+normal_vague_mod <- cmdstan_model("stan/normal_vague.stan")
+```
+
+```{r}
+normal_fit <- normal_mod$sample(
+  data = normal_list,
+  seed = 123,
+  chains = 4,
+  parallel_chains = 4,
+  iter_warmup = 1000, # number of warmup iterations
+  iter_sampling = 1000, # number of sampling iterations
+  refresh = 500 # print update every 500 iters
+)
+```
+
+```{r, eval=FALSE}
+normal_vague_fit <- normal_vague_mod$sample(
+  data = normal_list,
+  seed = 123,
+  chains = 4,
+  parallel_chains = 4,
+  refresh = 500 # print update every 500 iters
+)
+```
+
+### Summary
+
+We use this to write in manuscripts and for diagnostics.
+
+```{r}
+normal_fit$summary()
+```
+
+- `lp__`: log posterior.
+  - $\text{log}\; p(\theta \mid \text{data}) \propto \text{log}\; p(\text{data} \mid \theta) + \text{log}\; p(\theta)$
+
+- `rhat` (Gelman-Rubin statistic): should be close to 1.
+  - Measures the convergence of the chains.
+  - `rhat` > 1.1: Definitely bad.
+  - 1.01 < `rhat` < 1.1: Suspicous.
+  - `rhat` <=  1.01: Good.
+
+- `ess_bulk` and `ess_tail`: Effective sample size for bulk and tail of the posterior distribution.
+  - `ess_bulk`: sampling efficiency for the bulk posteriors (e.g., mean, SD).
+  - `ess_tail`: sampling efficiency for the tails (e.g., quantiles like 2.5%, 97.5%).
+  - `ess_bulk`, `ess_tail` > 400: Good.
+
+
+### Draws (posterior samples)
+
+For each parameter, we have 1000 iterations $\times$ 4 chains = 4000 posteriors.
+We use this for visualization and diagnostics.
+
+```{r}
+normal_fit$draws()
+```
+
+
+Trace plots for diagnosing convergence and mixing of the chains.
+```{r}
+normal_draws <- as_draws_df(normal_fit$draws())
+
+color_scheme_set("viridis")
+mcmc_trace(normal_draws, pars = c("mu", "sigma"))
+```
+
+Histograms of the posterior distributions of the parameters.
+
+```{r}
+mcmc_hist(normal_draws, pars = c("mu", "sigma"))
+```
+
+
+### Diagnostic summary
+
+```{r}
+normal_fit$diagnostic_summary()
+```
+
+- `num_divergent`: indicates the number of iterations (sampling transitions) where the Hamiltonian trajectory failed — meaning Stan detected a **divergent transition**.
+  - Even 1-2 divergent transitions suggest that model may not be reaiable, especially in hierachical models.
+  - We need reparamaterization or increase `adapt_delta` to make the sampler take smaller steps.
+
+- `num_max_treedepth`: indicates the number of iterations where there are not enough leafprog steps.
+  - This can indicate that the model is complex or that the priors are too tight.
+  - We can increase `max_treedepth` to allow more steps, but this can increase the computation time.
+
+- `ebfmi`: Energy-Bayesian Fraction of Missing Information
+  -	Measures whether the resampled momentum generates enough variation in energy to explore the posterior efficiently.
+  - Low `ebfmi` means the sampler may be stuck in tight regions and exploring poorly, even if Rhat and ESS look fine.
+  - Guidelines:
+    - `ebfmi` < 0.3: Bad
+    - 0.3 < `ebfmi` <= 1: Acceptable
+    - `ebfmi` >= 1: Good
+
+## `brms`
+
+```{r}
+normal_fit_brm <- brm(y ~ 1, family = gaussian(), data = normal_df)
+```
+
+
+### Summary
+
+```{r}
+summary(normal_fit_brm)
+```
+
+### Draws (posterior samples)
+
+```{r}
+normal_draws_brm <- posterior::as_draws_df(normal_fit_brm)
+normal_draws_brm
+```
+
+```{r}
+mcmc_trace(normal_draws_brm, pars = c("b_Intercept", "sigma"))
+mcmc_hist(normal_draws_brm, pars = c("b_Intercept", "sigma"))
+```
+
+### Diagnostic summary

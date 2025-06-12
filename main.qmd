@@ -1802,6 +1802,7 @@ ggplot(samples_long, aes(x = iter, y = value, color = param)) +
 CmdStan uses the latest version of Stan, whereas `rstan` is based on an older version.
 :::
 
+# more
 
 - Bayesian Estimation of Simple Models (with Stan)
 
