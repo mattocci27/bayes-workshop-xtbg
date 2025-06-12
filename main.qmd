@@ -17,6 +17,9 @@ format:
     controls: true
     width: 1440
     height: 810
+    # min-scale: 1.0   # never shrink below 100%
+    max-scale: 1.0   # never grow above 100%
+    # margin: 0       # no extra padding around it
     css: [assets/custom.css]
     include-after: |
       <link rel="stylesheet" href="assets/syntax-highlight.css">
@@ -85,18 +88,24 @@ hoge
 
 ## Outline: From Likelihood to Hierachical Bayesian Models in Ecology
 
+
+::: columns
+
+::: column
 ### 🧠Bayesian Foundations
 
 - Likelihood
 
 - Multilevel Models (Conceptual Motivation)
 
-- Conditional Probability and Bayes's Theorem
+- Conditional Probability and Bayes' Theorem
 
 - Prior
 
 - Multilevel Model Revisited
+:::
 
+::: column
 ### 🧑🏻‍💻Modeling with Stan
 
 - Tools for Bayesian Modeling
@@ -105,6 +114,8 @@ hoge
 
 - Bayesian Estimation of Multilevel Models (with Stan)
 
+:::
+:::
 
 # Likelihood
 
@@ -833,24 +844,34 @@ $$
 **➡️Forward problem:**
 If you are infected, what is the probability that PCR test is positive?
 
+<br>
+
 ::: fragment
-- $P(\text{Positive} \mid \text{Infected})$: 95%
+$P(\text{Positive} \mid \text{Infected})$: 95%
 :::
+
+<br>
 
 ::: fragment
 This is what the lab test is designed to estimate — how likely we are to observe a positive signal given the known infection status (e.g., 95 out of 100 infected samples test positive).
 :::
 
+## Forward and Inverse Problems: PCR and disease example
 
-::: fragment
-<br>
+::: footer
+- $P(\text{Positive})$: 2%, $P(\text{Infected})$: 0.05%
+:::
+
 **🔁Inverse problem (Bayesian):**
 If the PCR test is positive, what is the probability that you are infected?
-:::
+
+<br>
 
 ::: fragment
 - $P(\text{Infected} \mid \text{Positive}) = \frac{P(\text{Positive} \mid \text{Infected}) \cdot  P(\text{Infected})}{P(\text{Positive})} \approx 2.4\%$
 :::
+
+<br>
 
 ::: fragment
 This isn’t intuitive, but it’s the probability we actually care about — how likely someone is to be infected, given a positive test result.
@@ -1301,30 +1322,42 @@ We know `p_true` because we generated this data using `p_true` as a known parame
 
 ## Extreme case 1: Pooled estimates
 
+::: columns
+::: column
 - $S_i \sim \mathcal{B}(N_i, p)$: Likelihood
 - $\mathrm{logit}(p) \sim \mathcal{N}(0, 2.5)$: Prior
 
 ![](images/pool.png)
-<!-- <img src="images/pool.png" width="60%" style="display: block; margin: auto;"/> -->
+:::
 
+::: column
 ::: incremental
 - This model assumes all mother trees share the exact same survival rate.
+:::
+:::
 :::
 
 ---
 
 ## Extreme case 2: Separate estimates
 
+::: columns
+::: column
+
 - $S_i \sim \mathcal{B}(N_i, p_i)$: Likelihood
 - $\mathrm{logit}(p_i) \sim \mathcal{N}(0, 2.5)$: Prior
 
 ![](images/separate.png)
-<!-- <img src="images/separate.png" width="60%" style="display: block; margin: auto;"/> -->
+:::
 
+::: column
 ::: incremental
 - This model assumes each mother tree has a completely independent survival rate.
 - With limited data per tree, this model tends to overfit and produces noisy estimates.
 - We need to find a balance between these two extremes.
+:::
+
+:::
 :::
 
 ::: notes
@@ -1339,13 +1372,12 @@ We know `p_true` because we generated this data using `p_true` as a known parame
 
 - $S_i \sim \mathcal{B}(N_i, p_i)$: Likelihood
 
-- $\mathrm{logit}(p_i) \sim \mathcal{N}(\mu, \sigma)$: Hierarchical prior
+- $\mathrm{logit}(p_i) \sim \mathcal{N}(\mu, \sigma)$: Group-level model (hierarchical prior)
 
 - $\mu \sim \mathcal{N}(0, 2.5)$: Hyperprior
 
 - $\sigma \sim \text{Half-Cauchy}(0, 1)$: Hyperprior
 
-<!-- ![](images/multilevel.png) -->
 <img src="images/multilevel.png" width="80%" style="display: block; margin: auto;"/>
 
 ---
@@ -1437,6 +1469,97 @@ p4 / p5 / p6
 - sigma = 10 -> +/- 49.99%
 :::
 
+## Multilevel models yield better estimates
+
+::: columns
+::: {.column width="40%"}
+
+```{r}
+dummy_simple_re <- tar_read(dummy_simple_re)
+dummy_simple_re |>
+  mutate(p_bayes = round(p_bayes, 2)) |>
+  knitr::kable(format = "html") |>
+  kable_material(c("striped", "hover"), full_width = FALSE, font_size = 30)
+```
+:::
+
+::: {.column width="60%"}
+
+```{r, fig.height=5}
+dummy_simple_re |>
+  pivot_longer(c(p_like, p_bayes)) |>
+  ggplot(aes(x = p_true, y = value, fill = name)) +
+    # geom_jitter(size = 12, pch = 21, width = 0.001, alpha = 0.8) +
+    geom_point(size = 12, pch = 21, alpha = 0.8) +
+    annotate(geom = "text", x = 0.34, y = 0.38, label = "1:1", size = 10, angle = 18) +
+    geom_abline(slope = 1, intercept = 0, lty = 2) +
+    xlab("True survival rate") +
+    ylab("Estimated \nsurvival rate") +
+    theme(
+      legend.position = c(0.2, 0.75),
+      legend.text = element_text(size = 24),
+      legend.title = element_blank(),
+      legend.box.background = element_rect(color = "grey40", size = 1)
+    )
+```
+
+::: small
+::: incremental
+- Closed symbols (`p_bayes`{.small}) align more closely with the 1:1 line, indicating more accurate estimates.
+
+- This model compensates for limited data by using **prior** knowledge that tree responses are somehow similar and compensates for limited data.
+:::
+:::
+
+:::
+:::
+
+
+::: notes
+- less influenced by overfitting for each species
+
+- to understand prior, we need to understand Bayes's theorem a bit more
+:::
+
+## MLE vs. Bayesian estimation
+
+### MLE (e.g., `lme4`{.small})
+
+$L(\mu, \sigma) = \prod_i \int_{-\infty}^{\infty} \mathcal{B}(S_i \mid N_i, p_i) \times \mathcal{N}(\mathrm{logit}(p_i) \mid \mu, \sigma) dp_i$
+
+
+::: incremental
+
+- Analytically (or numerically) find $\mu$ and $\sigma$ that maximize $L$.
+
+- MLE often requires numerical integration, and this becomes difficult for complex models.
+
+- No prior; estimates can be unstable or biased with small data.
+
+:::
+
+## MLE vs. Bayesian estimation
+
+### Bayesian estimation
+
+$P(\mu, \sigma \mid S_i, N_i) \propto \prod_i \mathcal{B}(S_i \mid N_i, p_i) \times \prod_i \mathcal{N}(\mathrm{logit}(p_i) \mid \mu, \sigma) \times$ \n
+$\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\mathcal{N}(\mu \mid 0, 2.5) \times \text{Half-Cauchy}(0, 1)$
+
+::: incremental
+
+- Use simulations (MCMC) to appoximate $P$.
+
+- Baesyian methods work better for complex models because they explore the full distribution instead of just finding a single best value.
+
+- Priors help stabilize estimates, especially with limited data.
+
+:::
+
+::: notes
+posterior distribution is proportional to the likelihood times the prior
+:::
+
+
 # Tools for Bayesian Modeling
 
 ## Tools for Bayesian Modeling
@@ -1527,7 +1650,7 @@ $p(\theta_1, \theta_2 \mid \text{data}) \propto p(\text{data} \mid \theta_1, \th
 
 - Gibbs sampling approximates the joint posterior by sampling from these full conditionals.
 
-- Implemented in BUGS and JAGS software
+- Implemented in **BUGS** and **JAGS** software.
 
 :::
 
@@ -1568,20 +1691,21 @@ ggplot(samples_long, aes(x = iter, y = value, color = param)) +
 
 ::: {.column width=60%}
 
+:::incremental
+
 - $H(\theta, r) = U(\theta) + r^2/2$ (Hamitonian: potential energy + kinetic energy = constant)
 
-- Contour lines of $H(\theta, r)$ in the phase space ($\theta$ vs. $r$)
+  - $U(\theta) = -\text{log}\; p(\theta \mid \text{data})$
 
-- Instead of sampling from $p(\theta \mid \text{data})$, HMC samples from a joint distribution over both.
+- Instead of sampling from $p(\theta \mid \text{data})$, HMC samples from a joint distribution over both $\theta$ and $r$.
 
-$$
-p(\theta, r) \propto exp(-H(\theta, r))
-$$
+  - $p(\theta \mid \text{data}) \propto \int \text{exp}(-H(\theta, r))dr$
 
-$$
-p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-U(\theta))
-$$
+- It's equivalent to sampling from $p(\theta \mid \text{data}) \propto \text{exp}(-U(\theta))$.
 
+- HMS explores very different $\theta$ along the same trajectory (i.e. leapfrog path), which is much more efficient than random sampling.
+
+:::
 :::
 :::
 
@@ -1590,24 +1714,22 @@ $$
 
 ::: columns
 
-::: {.column width=40%}
+::: {.column width=30%}
 ![](images/leapfrog.gif)
 
 ![](images/hmc.gif)
 
 :::
 
-::: {.column width=60%}
+::: {.column width=70%}
 
-- hoge
+- Within each iteration, HMC simulates a trajectory using leapfrog steps.
 
-Why parameter in the same trajectory is better than random parameters?
+    -  No-U-Turn Sampler (NUTS) dynamically determines the number of leapfrog steps; we only need to set the maximum (e.g., `max_treedepth` in **Stan**).
 
-theta in the same trajectory may have the the same $p(\theta \mid data)$ because of this?
+- The Hamiltonian stays the same, but momentum $r$ is resampled each iteration.
 
-$$
-p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
-$$
+- Only the final parameter $\theta$ of each trajectory is kept as a posterior sample.
 
 :::
 :::
@@ -1627,7 +1749,7 @@ $$
 
 ::: columns
 
-::: {.column width=40%}
+::: {.column width=35%}
 
 <img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo.png" width=250 alt="Stan Logo"/>
 
@@ -1638,7 +1760,7 @@ $$
 
 :::
 
-::: {.column width=60%}
+::: {.column width=65%}
 
 ::: incremental
 
@@ -1680,9 +1802,12 @@ $$
 CmdStan uses the latest version of Stan, whereas `rstan` is based on an older version.
 :::
 
-# Bayesian Estimation of Simple Models
 
-## Stan code for a simple multilevel logistic model (non-verbal model){.small}
+- Bayesian Estimation of Simple Models (with Stan)
+
+- Bayesian Estimation of Multilevel Models (with Stan)
+
+<!-- ## Stan code for a simple multilevel logistic model (non-verbal model){.small}
 
 ::: columns
 ::: {.column width="50%"}
@@ -1712,61 +1837,10 @@ CmdStan uses the latest version of Stan, whereas `rstan` is based on an older ve
 :::
 :::
 
----
-
-## Multilevel models yield better estimates
-
-::: columns
-::: {.column width="40%"}
-
-```{r}
-dummy_simple_re <- tar_read(dummy_simple_re)
-dummy_simple_re |>
-  mutate(p_bayes = round(p_bayes, 2)) |>
-  knitr::kable(format = "html") |>
-  kable_material(c("striped", "hover"), full_width = FALSE, font_size = 30)
-```
-:::
-
-::: {.column width="50%"}
-
-```{r, fig.height=6}
-dummy_simple_re |>
-  pivot_longer(c(p_like, p_bayes)) |>
-  ggplot(aes(x = p_true, y = value, fill = name)) +
-    # geom_jitter(size = 12, pch = 21, width = 0.001, alpha = 0.8) +
-    geom_point(size = 12, pch = 21, alpha = 0.8) +
-    annotate(geom = "text", x = 0.34, y = 0.38, label = "1:1", size = 10, angle = 18) +
-    geom_abline(slope = 1, intercept = 0, lty = 2) +
-    xlab("True survival rate") +
-    ylab("Estimated \nsurvival rate") +
-    theme(
-      legend.position = c(0.2, 0.75),
-      legend.text = element_text(size = 24),
-      legend.title = element_blank(),
-      legend.box.background = element_rect(color = "grey40", size = 1)
-    )
-```
-
-::: small
-::: incremental
-- Closed symbols (`p_bayes`{.small}) align more closely with the 1:1 line, indicating more accurate estimates.
-
-- This model compensates for limited data by using **prior** knowledge that species responses are somehow similar and compensates for limited data.
-:::
-:::
-
-:::
-:::
+--- -->
 
 
-::: notes
-- less influenced by overfitting for each species
-
-- to understand prior, we need to understand Bayes's theorem a bit more
-:::
-
----
+<!-- ---
 
 ## MLE vs. Bayesian estimation
 
@@ -1833,33 +1907,6 @@ fit <- lme4::glmer(
 
 ---
 
-## MLE vs. Bayesian estimation
-
-::: incremental
-### MLE (e.g., `lme4`{.small})
-
-$L(\mu, \sigma) = \prod_i \int_{-\infty}^{\infty} \mathcal{B}(S_i \mid N_i, p_i) \times \mathcal{N}(\mathrm{logit}(p_i) \mid \mu, \sigma) dp_i$
-
-
-- Analytically find $\mu$ and $\sigma$ to maximize $L$
-
-- An analytical solution is often not available (this example is easy though)
-
-### Bayesian estimation
-
-$P(\mu, \sigma \mid S_i, N_i) \propto \prod_i \mathcal{B}(S_i \mid N_i, p_i) \times \prod_i \mathcal{N}(\mathrm{logit}(p_i) \mid \mu, \sigma) \times$ \n
-$\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\mathcal{N}(\mu \mid 0, 5) \times \mathcal{N}(\sigma \mid 0, 2.5)$
-
-- Numerically find $\mu$ and $\sigma$ to maximize $P$ (aka MCMC)
-
-- MCMC works even if an analytical solution is not available
-
-- Bayes's theorem supports the use of MCMC
-:::
-
-::: notes
-posterior distribution is proportional to the likelihood times the prior
-:::
 
 ## Summary
 
@@ -1879,7 +1926,7 @@ posterior distribution is proportional to the likelihood times the prior
 
 - Multilevel models handle nested or hierarchical data structures, a common and important scenario in ecological research (e.g., trees within species, community within sites, etc.).
 
-:::
+::: -->
 
 ## References
 

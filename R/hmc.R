@@ -255,6 +255,7 @@ generate_leapfrog_frame <- function(n, data, step, step2) {
                 aes(x = theta, y = p, group = gr3),
                 col = "red") +
       geom_path(aes(x = theta, y = p, group = gr), lty = 2) +
+      ylab("r") +
       coord_cartesian(xlim = c(-0.2, 3.5),
                       ylim = c(-5, 5)) +
       theme_bw(base_size = 28)
@@ -336,6 +337,7 @@ generate_hmc_frame <- function(n_iter, n_burn, data, sim_res) {
               lwd = 0.2) +
     geom_point(data = sim_res_n, aes(x = theta, y = p, shape = burn), size = 4) +
     scale_shape_manual(values = c(1, 16)) +
+    ylab("r") +
     coord_cartesian(xlim = c(-0.2, 3.5),
                     ylim = c(-5, 5)) +
     theme_bw(base_size = 28) +

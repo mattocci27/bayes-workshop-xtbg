@@ -275,20 +275,24 @@
 </section>
 <section id="outline-from-likelihood-to-hierachical-bayesian-models-in-ecology" class="slide level2">
 <h2>Outline: From Likelihood to Hierachical Bayesian Models in Ecology</h2>
+<div class="columns">
+<div class="column">
 <h3 id="bayesian-foundations">🧠Bayesian Foundations</h3>
 <ul>
 <li><p>Likelihood</p></li>
 <li><p>Multilevel Models (Conceptual Motivation)</p></li>
-<li><p>Conditional Probability and Bayes’s Theorem</p></li>
+<li><p>Conditional Probability and Bayes’ Theorem</p></li>
 <li><p>Prior</p></li>
 <li><p>Multilevel Model Revisited</p></li>
 </ul>
+</div><div class="column">
 <h3 id="modeling-with-stan">🧑🏻‍💻Modeling with Stan</h3>
 <ul>
 <li><p>Tools for Bayesian Modeling</p></li>
 <li><p>Bayesian Estimation of Simple Models (with Stan)</p></li>
 <li><p>Bayesian Estimation of Multilevel Models (with Stan)</p></li>
 </ul>
+</div></div>
 </section>
 <section>
 <section id="likelihood" class="title-slide slide level1 center">
@@ -751,22 +755,30 @@ P(A \mid B) = \frac{P(B \mid A) \times P(A)}{P(B)}
 </ul>
 </div>
 <p><strong>➡️Forward problem:</strong> If you are infected, what is the probability that PCR test is positive?</p>
+<p><br></p>
 <div class="fragment">
-<ul>
-<li><span class="math inline">\(P(\text{Positive} \mid \text{Infected})\)</span>: 95%</li>
-</ul>
+<p><span class="math inline">\(P(\text{Positive} \mid \text{Infected})\)</span>: 95%</p>
 </div>
+<p><br></p>
 <div class="fragment">
 <p>This is what the lab test is designed to estimate — how likely we are to observe a positive signal given the known infection status (e.g., 95 out of 100 infected samples test positive).</p>
 </div>
-<div class="fragment">
-<p><br> <strong>🔁Inverse problem (Bayesian):</strong> If the PCR test is positive, what is the probability that you are infected?</p>
+</section>
+<section id="forward-and-inverse-problems-pcr-and-disease-example-1" class="slide level2">
+<h2>Forward and Inverse Problems: PCR and disease example</h2>
+<div class="footer">
+<ul>
+<li><span class="math inline">\(P(\text{Positive})\)</span>: 2%, <span class="math inline">\(P(\text{Infected})\)</span>: 0.05%</li>
+</ul>
 </div>
+<p><strong>🔁Inverse problem (Bayesian):</strong> If the PCR test is positive, what is the probability that you are infected?</p>
+<p><br></p>
 <div class="fragment">
 <ul>
 <li><span class="math inline">\(P(\text{Infected} \mid \text{Positive}) = \frac{P(\text{Positive} \mid \text{Infected}) \cdot  P(\text{Infected})}{P(\text{Positive})} \approx 2.4\%\)</span></li>
 </ul>
 </div>
+<p><br></p>
 <div class="fragment">
 <p>This isn’t intuitive, but it’s the probability we actually care about — how likely someone is to be infected, given a positive test result.</p>
 </div>
@@ -1273,27 +1285,35 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 </section>
 <section id="extreme-case-1-pooled-estimates" class="slide level2">
 <h2>Extreme case 1: Pooled estimates</h2>
+<div class="columns">
+<div class="column">
 <ul>
 <li><span class="math inline">\(S_i \sim \mathcal{B}(N_i, p)\)</span>: Likelihood</li>
 <li><span class="math inline">\(\mathrm{logit}(p) \sim \mathcal{N}(0, 2.5)\)</span>: Prior</li>
 </ul>
-<p><img data-src="images/pool.png"> </p>
+<p><img data-src="images/pool.png"></p>
+</div><div class="column">
 <ul>
 <li class="fragment">This model assumes all mother trees share the exact same survival rate.</li>
 </ul>
+</div></div>
 </section>
 <section id="extreme-case-2-separate-estimates" class="slide level2">
 <h2>Extreme case 2: Separate estimates</h2>
+<div class="columns">
+<div class="column">
 <ul>
 <li><span class="math inline">\(S_i \sim \mathcal{B}(N_i, p_i)\)</span>: Likelihood</li>
 <li><span class="math inline">\(\mathrm{logit}(p_i) \sim \mathcal{N}(0, 2.5)\)</span>: Prior</li>
 </ul>
-<p><img data-src="images/separate.png"> </p>
+<p><img data-src="images/separate.png"></p>
+</div><div class="column">
 <ul>
 <li class="fragment">This model assumes each mother tree has a completely independent survival rate.</li>
 <li class="fragment">With limited data per tree, this model tends to overfit and produces noisy estimates.</li>
 <li class="fragment">We need to find a balance between these two extremes.</li>
 </ul>
+</div></div>
 <aside class="notes">
 <ul>
 <li>if we have infinite amount of data, we can estimate survival rates separately</li>
@@ -1316,7 +1336,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <h2>More realistic estimates: Multilevel models</h2>
 <ul>
 <li><p><span class="math inline">\(S_i \sim \mathcal{B}(N_i, p_i)\)</span>: Likelihood</p></li>
-<li><p><span class="math inline">\(\mathrm{logit}(p_i) \sim \mathcal{N}(\mu, \sigma)\)</span>: Hierarchical prior</p></li>
+<li><p><span class="math inline">\(\mathrm{logit}(p_i) \sim \mathcal{N}(\mu, \sigma)\)</span>: Group-level model (hierarchical prior)</p></li>
 <li><p><span class="math inline">\(\mu \sim \mathcal{N}(0, 2.5)\)</span>: Hyperprior</p></li>
 <li><p><span class="math inline">\(\sigma \sim \text{Half-Cauchy}(0, 1)\)</span>: Hyperprior</p></li>
 </ul>
@@ -1368,258 +1388,6 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
-</section></section>
-<section>
-<section id="tools-for-bayesian-modeling" class="title-slide slide level1 center">
-<h1>Tools for Bayesian Modeling</h1>
-
-</section>
-<section id="tools-for-bayesian-modeling-1" class="slide level2">
-<h2>Tools for Bayesian Modeling</h2>
-
-<img data-src="figure/unnamed-chunk-29-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"><ul>
-<li>Basic idea of MCMC</li>
-<li>Stan: A modern language for Bayesian modeling</li>
-<li>Interfaces to Stan</li>
-</ul>
-</section>
-<section id="mcmc-markov-chain-monte-carlo" class="slide level2">
-<h2>MCMC (Markov Chain Monte Carlo)</h2>
-<p><strong>Goal</strong>: Aproximate the posterior distribution of parameters given the data instead of calculating it directly.</p>
-<p><br></p>
-<div class="fragment">
-<p>For simple models, we can analytically find parameters that maximize the posterior distribution.</p>
-<p>Coin B example again:</p>
-<p><span class="math inline">\(\textcolor{#d95f02}{Post_B}\propto\textcolor{#1b9e77}{p^{60} (1-p)^{40}} \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}\)</span></p>
-<p><span class="math inline">\(p = 110/200 = 0.55\)</span></p>
-</div>
-</section>
-<section id="mcmc-a-simplified-metropolis-hastings-mh-algorithm" class="slide level2">
-<h2>MCMC: a simplified Metropolis-Hastings (MH) algorithm</h2>
-<div class="columns">
-<div class="column" style="width:40%;">
-<p><img data-src="images/mh_trace.gif"></p>
-<p><img data-src="images/mh_post.gif"></p>
-</div><div class="column" style="width:60%;">
-<ul>
-<li class="fragment">Start with some values of <em>p</em> (e.g., 0.2 and 0.8).</li>
-<li class="fragment">Caclulate the posterior of those values.</li>
-<li class="fragment">Repeat the followings steps N times:
-<ul>
-<li class="fragment">Propose a new value of <span class="math inline">\(p_{\text{new}}\)</span> (e.g., <span class="math inline">\(p \pm 0.01\)</span>)</li>
-<li class="fragment">Calculate the posterior at <span class="math inline">\(p_{\text{new}}\)</span>.</li>
-<li class="fragment">If <span class="math inline">\(\text{Post}(p_{\text{new}}) \geq \text{Post}(p_t), \text{ then } p_{t+1} = p_{\text{new}}\)</span>.</li>
-<li class="fragment">Else, accept <span class="math inline">\(p_{\text{new}}\)</span> with probability <span class="math inline">\(\frac{\text{Post}(p_{\text{new}})}{\text{Post}(p_t)}\)</span>.</li>
-</ul></li>
-</ul>
-</div></div>
-</section>
-<section id="mcmc-gibbs-sampling" class="slide level2">
-<h2>MCMC: Gibbs sampling</h2>
-<ul>
-<li class="fragment"><p>Sampling <span class="math inline">\(\theta_1\)</span>, <span class="math inline">\(\theta_2\)</span> jointly is hard: <span class="math inline">\(p(\theta_1, \theta_2 \mid \text{data}) \propto p(\text{data} \mid \theta_1, \theta_2) \times p(\theta_1, \theta_2)\)</span></p></li>
-<li class="fragment"><p>Instead, we sample <span class="math inline">\(\theta_1\)</span> and <span class="math inline">\(\theta_2\)</span> sequentially:</p>
-<ul>
-<li class="fragment"><p><span class="math inline">\(p(\theta_1 \mid \theta_2, \text{data}) \propto p(\text{data} \mid \theta_1, \theta_2) \times p(\theta_1  \mid \theta_2)\)</span></p></li>
-<li class="fragment"><p><span class="math inline">\(p(\theta_2 \mid \theta_1, \text{data}) \propto p(\text{data} \mid \theta_1, \theta_2) \times p(\theta_2  \mid \theta_1)\)</span></p></li>
-<li class="fragment"><p><span class="math inline">\(\theta_1^{(t)} \sim p(\theta_1 \mid \theta^{(t-1)}_2, \text{data})\)</span></p></li>
-<li class="fragment"><p><span class="math inline">\(\theta_2^{(t)} \sim p(\theta_2 \mid \theta^{(t)}_1, \text{data})\)</span></p></li>
-</ul></li>
-<li class="fragment"><p>Gibbs sampling approximates the joint posterior by sampling from these full conditionals.</p></li>
-<li class="fragment"><p>Implemented in BUGS and JAGS software</p></li>
-</ul>
-</section>
-<section id="mcmc-hamiltonian-monte-carlo-hmc" class="slide level2">
-<h2>MCMC: Hamiltonian Monte Carlo (HMC)</h2>
-<div class="columns">
-<div class="column" style="width:40%;">
-<p><img data-src="images/pot_eng.gif"></p>
-<p><img data-src="images/traj.gif"></p>
-</div><div class="column" style="width:60%;">
-<ul>
-<li><p><span class="math inline">\(H(\theta, r) = U(\theta) + r^2/2\)</span> (Hamitonian: potential energy + kinetic energy = constant)</p></li>
-<li><p>Contour lines of <span class="math inline">\(H(\theta, r)\)</span> in the phase space (<span class="math inline">\(\theta\)</span> vs.&nbsp;<span class="math inline">\(r\)</span>)</p></li>
-<li><p>Instead of sampling from <span class="math inline">\(p(\theta \mid \text{data})\)</span>, HMC samples from a joint distribution over both.</p></li>
-</ul>
-<p><span class="math display">\[
-p(\theta, r) \propto exp(-H(\theta, r))
-\]</span></p>
-<p><span class="math display">\[
-p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-U(\theta))
-\]</span></p>
-</div></div>
-</section>
-<section id="mcmc-hamiltonian-monte-carlo-hmc-1" class="slide level2">
-<h2>MCMC: Hamiltonian Monte Carlo (HMC)</h2>
-<div class="columns">
-<div class="column" style="width:40%;">
-<p><img data-src="images/leapfrog.gif"></p>
-<p><img data-src="images/hmc.gif"></p>
-</div><div class="column" style="width:60%;">
-<ul>
-<li>hoge</li>
-</ul>
-<p>Why parameter in the same trajectory is better than random parameters?</p>
-<p>theta in the same trajectory may have the the same <span class="math inline">\(p(\theta \mid data)\)</span> because of this?</p>
-<p><span class="math display">\[
-p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
-\]</span></p>
-</div></div>
-</section>
-<section id="mcmc-methods-comparison" class="slide level2">
-<h2>MCMC Methods: Comparison</h2>
-<table class="caption-top">
-<colgroup>
-<col style="width: 18%">
-<col style="width: 24%">
-<col style="width: 28%">
-<col style="width: 28%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Feature</th>
-<th><strong>Metropolis(-Hastings)</strong></th>
-<th><strong>Gibbs Sampling</strong></th>
-<th><strong>Hamiltonian Monte Carlo (HMC)</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>How it works</td>
-<td>Try random moves, accept/reject</td>
-<td>Update one parameter at a time</td>
-<td>Simulate smooth movement using gradients</td>
-</tr>
-<tr class="even">
-<td>Efficient in high dimensions?</td>
-<td>❌ Often slow</td>
-<td>✅ If math is simple</td>
-<td>✅ Very efficient</td>
-</tr>
-<tr class="odd">
-<td>Flexible?</td>
-<td>✅ Yes</td>
-<td>❌ No (conjugate priors)</td>
-<td>✅ Yes</td>
-</tr>
-<tr class="even">
-<td>Typical software</td>
-<td>JAGS, custom R</td>
-<td>JAGS, BUGS</td>
-<td>Stan</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="stan-a-modern-languagesoftware-for-bayesian-modeling" class="slide level2">
-<h2>Stan: A modern language/software for Bayesian modeling</h2>
-<div class="columns">
-<div class="column" style="width:40%;">
-<p><img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo.png" width="250" alt="Stan Logo"></p>
-<div class="cell" data-layout-align="center" data-output.var="bernoulli">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource stan number-lines code-with-copy"><code class="sourceCode stan"><span id="cb14-1"><a href=""></a><span class="kw">data</span> {</span>
-<span id="cb14-2"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; N;</span>
-<span id="cb14-3"><a href=""></a>  <span class="dt">array</span>[N] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>, <span class="kw">upper</span>=<span class="dv">1</span>&gt; y;</span>
-<span id="cb14-4"><a href=""></a>}</span>
-<span id="cb14-5"><a href=""></a><span class="kw">parameters</span> {</span>
-<span id="cb14-6"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>, <span class="kw">upper</span>=<span class="dv">1</span>&gt; theta;</span>
-<span id="cb14-7"><a href=""></a>}</span>
-<span id="cb14-8"><a href=""></a><span class="kw">model</span> {</span>
-<span id="cb14-9"><a href=""></a>  <span class="co">// uniform prior on interval 0,1</span></span>
-<span id="cb14-10"><a href=""></a>  theta ~ beta(<span class="dv">1</span>, <span class="dv">1</span>);</span>
-<span id="cb14-11"><a href=""></a>  <span class="co">// likelihood</span></span>
-<span id="cb14-12"><a href=""></a>  y ~ bernoulli(theta);</span>
-<span id="cb14-13"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div><div class="column" style="width:60%;">
-<ul>
-<li class="fragment"><p>🧑🏻‍💻 <strong>Bayesian Modeling</strong></p>
-<ul>
-<li class="fragment">Stan uses the No-U-Turn sampler (NUTS), a variant of Hamiltonian Monte Carlo (HMC), which is efficient for complex models with many parameters.</li>
-</ul></li>
-<li class="fragment"><p>⚙️ <strong>Flexible and Scalable</strong></p>
-<ul>
-<li class="fragment">You can use Stan for many types of models, from simple regressions to multi-level models including time-series, spatial, SEM, and more.</li>
-</ul></li>
-<li class="fragment"><p>💻 <strong>Multiplatform</strong></p>
-<ul>
-<li class="fragment">Stan works with R, Python, Julia, and more. It also has tools for checking models and making visualizations.</li>
-</ul></li>
-</ul>
-</div></div>
-</section>
-<section id="interfaces-to-stan-for-r-users" class="slide level2">
-<h2>Interfaces to Stan (for R users)</h2>
-<ul>
-<li>Stan: The acutal modeling and inference engine, written in C++.</li>
-</ul>
-<ul>
-<li class="fragment"><p>CmdStan: Command line interface (you write Stan code and run it via terminal).</p></li>
-<li class="fragment"><p><code>rstan</code>, <code>cmdstanr</code>: R interface to Stan/Cmdstan (you write Stan code and run it within R).</p></li>
-<li class="fragment"><p><code>brms</code>, <code>rstanarm</code>: Higher-level R packages that depend on <code>rstan</code> (you write R code and run models within R, without writing Stan code).</p></li>
-<li class="fragment"><p>In this course, we will use <code>cmdstanr</code> and <code>brms</code>.</p></li>
-</ul>
-<div class="footer">
-<p>CmdStan uses the latest version of Stan, whereas <code>rstan</code> is based on an older version.</p>
-</div>
-</section></section>
-<section>
-<section id="bayesian-estimation-of-simple-models" class="title-slide slide level1 center">
-<h1>Bayesian Estimation of Simple Models</h1>
-
-</section>
-<section id="stan-code-for-a-simple-multilevel-logistic-model-non-verbal-model" class="slide level2 small">
-<h2>Stan code for a simple multilevel logistic model (non-verbal model)</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<div class="cell" data-layout-align="center" data-output.var="simple_logistic">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource stan number-lines code-with-copy"><code class="sourceCode stan"><span id="cb15-1"><a href=""></a><span class="kw">data</span> {</span>
-<span id="cb15-2"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; I; <span class="co">// number of species</span></span>
-<span id="cb15-3"><a href=""></a>  <span class="dt">array</span>[I] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; suv; <span class="co">// number of survivors</span></span>
-<span id="cb15-4"><a href=""></a>  <span class="dt">array</span>[I] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; N; <span class="co">// number of individuals</span></span>
-<span id="cb15-5"><a href=""></a>  <span class="dt">array</span>[I] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>, <span class="kw">upper</span>=I&gt; ii; <span class="co">// integer</span></span>
-<span id="cb15-6"><a href=""></a>}</span>
-<span id="cb15-7"><a href=""></a></span>
-<span id="cb15-8"><a href=""></a><span class="kw">parameters</span> {</span>
-<span id="cb15-9"><a href=""></a>  <span class="dt">real</span> mu;</span>
-<span id="cb15-10"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; sigma;</span>
-<span id="cb15-11"><a href=""></a>  <span class="dt">vector</span>[I] z_tilde;</span>
-<span id="cb15-12"><a href=""></a>}</span>
-<span id="cb15-13"><a href=""></a></span>
-<span id="cb15-14"><a href=""></a><span class="kw">transformed parameters</span> {</span>
-<span id="cb15-15"><a href=""></a>  <span class="dt">vector</span>[I] z;</span>
-<span id="cb15-16"><a href=""></a>  z = mu + sigma * z_tilde;</span>
-<span id="cb15-17"><a href=""></a>}</span>
-<span id="cb15-18"><a href=""></a></span>
-<span id="cb15-19"><a href=""></a><span class="kw">model</span> {</span>
-<span id="cb15-20"><a href=""></a>  mu ~ normal(<span class="dv">0</span>, <span class="dv">5</span>);</span>
-<span id="cb15-21"><a href=""></a>  z_tilde ~ std_normal();</span>
-<span id="cb15-22"><a href=""></a>  sigma ~ std_normal();</span>
-<span id="cb15-23"><a href=""></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span>:I)</span>
-<span id="cb15-24"><a href=""></a>    suv[i] ~ binomial_logit(N[i], z[ii[i]]);</span>
-<span id="cb15-25"><a href=""></a>}</span>
-<span id="cb15-26"><a href=""></a></span>
-<span id="cb15-27"><a href=""></a><span class="kw">generated quantities</span> {</span>
-<span id="cb15-28"><a href=""></a>  <span class="dt">vector</span>[I] log_lik;</span>
-<span id="cb15-29"><a href=""></a>  <span class="dt">vector</span>[I] p = inv_logit(z);</span>
-<span id="cb15-30"><a href=""></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span>:I)</span>
-<span id="cb15-31"><a href=""></a>    log_lik[i] = binomial_logit_lpmf(suv[i] | N[i], z[ii[i]]);</span>
-<span id="cb15-32"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div><div class="column" style="width:50%;">
-<h3 id="centered-parameterization">Centered parameterization</h3>
-<ul>
-<li><p><span class="math inline">\(S_i \sim \mathcal{B}_{logit}(N_i, z_i)\)</span>: likelihood</p></li>
-<li><p><span class="math inline">\(z_i \sim \mathcal{N}(\mu, \sigma)\)</span> : prior</p></li>
-<li><p><span class="math inline">\(\sigma \sim \mathcal{N}(0, 1)\)</span>: prior</p></li>
-<li><p><span class="math inline">\(\mu \sim \mathcal{N}(0, 5)\)</span>: prior</p></li>
-</ul>
-<h3 id="non-centered-parameterization">Non-Centered parameterization</h3>
-<ul>
-<li><p><span class="math inline">\(z_i = \mu + \sigma \cdot \tilde{z_i}\)</span></p></li>
-<li><p><span class="math inline">\(\tilde{z_i} \sim \mathcal{N}(0, 1)\)</span>: prior</p></li>
-</ul>
-</div></div>
 </section>
 <section id="multilevel-models-yield-better-estimates" class="slide level2">
 <h2>Multilevel models yield better estimates</h2>
@@ -1707,12 +1475,12 @@ p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
 </table>
 </div>
 </div>
-</div><div class="column" style="width:50%;">
+</div><div class="column" style="width:60%;">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="figure/unnamed-chunk-34-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
+<p><img data-src="figure/unnamed-chunk-30-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1720,7 +1488,7 @@ p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
 <div class="small">
 <ul>
 <li class="fragment"><p>Closed symbols (<code class="small">p_bayes</code>) align more closely with the 1:1 line, indicating more accurate estimates.</p></li>
-<li class="fragment"><p>This model compensates for limited data by using <strong>prior</strong> knowledge that species responses are somehow similar and compensates for limited data.</p></li>
+<li class="fragment"><p>This model compensates for limited data by using <strong>prior</strong> knowledge that tree responses are somehow similar and compensates for limited data.</p></li>
 </ul>
 </div>
 </div></div>
@@ -1743,126 +1511,22 @@ p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
 </section>
 <section id="mle-vs.-bayesian-estimation" class="slide level2">
 <h2>MLE vs.&nbsp;Bayesian estimation</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<p>Bayesian estimation (<code>stan</code>)</p>
-<div class="cell" data-layout-align="center" data-output.var="simple_logistic">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource stan number-lines code-with-copy"><code class="sourceCode stan"><span id="cb16-1"><a href=""></a><span class="kw">data</span> {</span>
-<span id="cb16-2"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; I; <span class="co">// number of species</span></span>
-<span id="cb16-3"><a href=""></a>  <span class="dt">array</span>[I] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; suv; <span class="co">// number of survivors</span></span>
-<span id="cb16-4"><a href=""></a>  <span class="dt">array</span>[I] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; N; <span class="co">// number of individuals</span></span>
-<span id="cb16-5"><a href=""></a>  <span class="dt">array</span>[I] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>, <span class="kw">upper</span>=I&gt; ii; <span class="co">// integer</span></span>
-<span id="cb16-6"><a href=""></a>}</span>
-<span id="cb16-7"><a href=""></a></span>
-<span id="cb16-8"><a href=""></a><span class="kw">parameters</span> {</span>
-<span id="cb16-9"><a href=""></a>  <span class="dt">real</span> mu;</span>
-<span id="cb16-10"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; sigma;</span>
-<span id="cb16-11"><a href=""></a>  <span class="dt">vector</span>[I] z_tilde;</span>
-<span id="cb16-12"><a href=""></a>}</span>
-<span id="cb16-13"><a href=""></a></span>
-<span id="cb16-14"><a href=""></a><span class="kw">transformed parameters</span> {</span>
-<span id="cb16-15"><a href=""></a>  <span class="dt">vector</span>[I] z;</span>
-<span id="cb16-16"><a href=""></a>  z = mu + sigma * z_tilde;</span>
-<span id="cb16-17"><a href=""></a>}</span>
-<span id="cb16-18"><a href=""></a></span>
-<span id="cb16-19"><a href=""></a><span class="kw">model</span> {</span>
-<span id="cb16-20"><a href=""></a>  mu ~ normal(<span class="dv">0</span>, <span class="dv">5</span>);</span>
-<span id="cb16-21"><a href=""></a>  z_tilde ~ std_normal();</span>
-<span id="cb16-22"><a href=""></a>  sigma ~ std_normal();</span>
-<span id="cb16-23"><a href=""></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span>:I)</span>
-<span id="cb16-24"><a href=""></a>    suv[i] ~ binomial_logit(N[i], z[ii[i]]);</span>
-<span id="cb16-25"><a href=""></a>}</span>
-<span id="cb16-26"><a href=""></a></span>
-<span id="cb16-27"><a href=""></a><span class="kw">generated quantities</span> {</span>
-<span id="cb16-28"><a href=""></a>  <span class="dt">vector</span>[I] log_lik;</span>
-<span id="cb16-29"><a href=""></a>  <span class="dt">vector</span>[I] p = inv_logit(z);</span>
-<span id="cb16-30"><a href=""></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span>:I)</span>
-<span id="cb16-31"><a href=""></a>    log_lik[i] = binomial_logit_lpmf(suv[i] | N[i], z[ii[i]]);</span>
-<span id="cb16-32"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div><div class="column" style="width:50%;">
-<p>MLE (<code>lme4::glmer</code>)</p>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href=""></a>fit <span class="ot">&lt;-</span> lme4<span class="sc">::</span><span class="fu">glmer</span>(</span>
-<span id="cb17-2"><a href=""></a>   <span class="fu">cbind</span>(suv, n <span class="sc">-</span> suv) <span class="sc">~</span>  (<span class="dv">1</span> <span class="sc">|</span> sp),</span>
-<span id="cb17-3"><a href=""></a>   <span class="at">data =</span> dummy_simple,</span>
-<span id="cb17-4"><a href=""></a>   <span class="at">family =</span> binomial)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<ul>
-<li class="fragment">We can do MLE for these kind of simple models.</li>
-<li class="fragment">When a model is complicated, MLE often does not work well.</li>
-<li class="fragment">Model flexibility for MLE is limited.</li>
-</ul>
-</div></div>
-<aside class="notes">
-<ul>
-<li>You need to rely on functions, such as <code>lme4::glmer</code>.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="mle-vs.-bayesian-estimation-1" class="slide level2">
-<h2>MLE vs.&nbsp;Bayesian estimation</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<p>Bayesian estimation (<code>brms</code>)</p>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href=""></a>fit <span class="ot">&lt;-</span> brms<span class="sc">::</span><span class="fu">brm</span>(</span>
-<span id="cb18-2"><a href=""></a>  suv <span class="sc">|</span> <span class="fu">trials</span>(n) <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> sp),</span>
-<span id="cb18-3"><a href=""></a>  <span class="at">data =</span> dummy_simple,</span>
-<span id="cb18-4"><a href=""></a>  <span class="at">family =</span> <span class="fu">binomial</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div><div class="column" style="width:50%;">
-<p>MLE (<code>lme4::glmer</code>)</p>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href=""></a>fit <span class="ot">&lt;-</span> lme4<span class="sc">::</span><span class="fu">glmer</span>(</span>
-<span id="cb19-2"><a href=""></a>   <span class="fu">cbind</span>(suv, n <span class="sc">-</span> suv) <span class="sc">~</span>  (<span class="dv">1</span> <span class="sc">|</span> sp),</span>
-<span id="cb19-3"><a href=""></a>   <span class="at">data =</span> dummy_simple,</span>
-<span id="cb19-4"><a href=""></a>   <span class="at">family =</span> binomial)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div></div>
-<ul>
-<li>Several packages, like <code>brms</code> and <code>rstanarm</code>, offer Bayesian estimation using syntax similar to <code>lme4</code>.</li>
-</ul>
-<aside class="notes">
-<ul>
-<li>You need to rely on functions, such as <code>lme4::glmer</code>.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="mle-vs.-bayesian-estimation-2" class="slide level2">
-<h2>MLE vs.&nbsp;Bayesian estimation</h2>
 <h3 id="mle-e.g.-lme4">MLE (e.g., <code class="small">lme4</code>)</h3>
 <p><span class="math inline">\(L(\mu, \sigma) = \prod_i \int_{-\infty}^{\infty} \mathcal{B}(S_i \mid N_i, p_i) \times \mathcal{N}(\mathrm{logit}(p_i) \mid \mu, \sigma) dp_i\)</span></p>
 <ul>
-<li class="fragment"><p>Analytically find <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> to maximize <span class="math inline">\(L\)</span></p></li>
-<li class="fragment"><p>An analytical solution is often not available (this example is easy though)</p></li>
+<li class="fragment"><p>Analytically (or numerically) find <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> that maximize <span class="math inline">\(L\)</span>.</p></li>
+<li class="fragment"><p>MLE often requires numerical integration, and this becomes difficult for complex models.</p></li>
+<li class="fragment"><p>No prior; estimates can be unstable or biased with small data.</p></li>
 </ul>
+</section>
+<section id="mle-vs.-bayesian-estimation-1" class="slide level2">
+<h2>MLE vs.&nbsp;Bayesian estimation</h2>
 <h3 id="bayesian-estimation">Bayesian estimation</h3>
-<p><span class="math inline">\(P(\mu, \sigma \mid S_i, N_i) \propto \prod_i \mathcal{B}(S_i \mid N_i, p_i) \times \prod_i \mathcal{N}(\mathrm{logit}(p_i) \mid \mu, \sigma) \times\)</span> <span class="math inline">\(\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\mathcal{N}(\mu \mid 0, 5) \times \mathcal{N}(\sigma \mid 0, 2.5)\)</span></p>
+<p><span class="math inline">\(P(\mu, \sigma \mid S_i, N_i) \propto \prod_i \mathcal{B}(S_i \mid N_i, p_i) \times \prod_i \mathcal{N}(\mathrm{logit}(p_i) \mid \mu, \sigma) \times\)</span> <span class="math inline">\(\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\mathcal{N}(\mu \mid 0, 2.5) \times \text{Half-Cauchy}(0, 1)\)</span></p>
 <ul>
-<li class="fragment"><p>Numerically find <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> to maximize <span class="math inline">\(P\)</span> (aka MCMC)</p></li>
-<li class="fragment"><p>MCMC works even if an analytical solution is not available</p></li>
-<li class="fragment"><p>Bayes’s theorem supports the use of MCMC</p></li>
+<li class="fragment"><p>Use simulations (MCMC) to appoximate <span class="math inline">\(P\)</span>.</p></li>
+<li class="fragment"><p>Baesyian methods work better for complex models because they explore the full distribution instead of just finding a single best value.</p></li>
+<li class="fragment"><p>Priors help stabilize estimates, especially with limited data.</p></li>
 </ul>
 <aside class="notes">
 <p>posterior distribution is proportional to the likelihood times the prior</p>
@@ -1877,19 +1541,204 @@ p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
+</section></section>
+<section>
+<section id="tools-for-bayesian-modeling" class="title-slide slide level1 center">
+<h1>Tools for Bayesian Modeling</h1>
+
 </section>
-<section id="summary" class="slide level2">
-<h2>Summary</h2>
-<h3 id="why-bayesian-estimation-is-useful">Why Bayesian estimation is useful</h3>
-<ul>
-<li class="fragment"><p>We can use a priori information about parameters in our model</p></li>
-<li class="fragment"><p>Models are flexible</p></li>
-<li class="fragment"><p>MCMC works even if models are complicated</p></li>
+<section id="tools-for-bayesian-modeling-1" class="slide level2">
+<h2>Tools for Bayesian Modeling</h2>
+
+<img data-src="figure/unnamed-chunk-31-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"><ul>
+<li>Basic idea of MCMC</li>
+<li>Stan: A modern language for Bayesian modeling</li>
+<li>Interfaces to Stan</li>
 </ul>
-<h3 id="why-multilevel-models-are-important">Why multilevel models are important</h3>
+</section>
+<section id="mcmc-markov-chain-monte-carlo" class="slide level2">
+<h2>MCMC (Markov Chain Monte Carlo)</h2>
+<p><strong>Goal</strong>: Aproximate the posterior distribution of parameters given the data instead of calculating it directly.</p>
+<p><br></p>
+<div class="fragment">
+<p>For simple models, we can analytically find parameters that maximize the posterior distribution.</p>
+<p>Coin B example again:</p>
+<p><span class="math inline">\(\textcolor{#d95f02}{Post_B}\propto\textcolor{#1b9e77}{p^{60} (1-p)^{40}} \times\textcolor{#7570b3}{p^{50} (1-p)^{50}}\)</span></p>
+<p><span class="math inline">\(p = 110/200 = 0.55\)</span></p>
+</div>
+</section>
+<section id="mcmc-a-simplified-metropolis-hastings-mh-algorithm" class="slide level2">
+<h2>MCMC: a simplified Metropolis-Hastings (MH) algorithm</h2>
+<div class="columns">
+<div class="column" style="width:40%;">
+<p><img data-src="images/mh_trace.gif"></p>
+<p><img data-src="images/mh_post.gif"></p>
+</div><div class="column" style="width:60%;">
 <ul>
-<li class="fragment"><p>Multilevel models have a good balance between pooled estimates and separate estimates, which is useful for practical sample sizes</p></li>
-<li class="fragment"><p>Multilevel models handle nested or hierarchical data structures, a common and important scenario in ecological research (e.g., trees within species, community within sites, etc.).</p></li>
+<li class="fragment">Start with some values of <em>p</em> (e.g., 0.2 and 0.8).</li>
+<li class="fragment">Caclulate the posterior of those values.</li>
+<li class="fragment">Repeat the followings steps N times:
+<ul>
+<li class="fragment">Propose a new value of <span class="math inline">\(p_{\text{new}}\)</span> (e.g., <span class="math inline">\(p \pm 0.01\)</span>)</li>
+<li class="fragment">Calculate the posterior at <span class="math inline">\(p_{\text{new}}\)</span>.</li>
+<li class="fragment">If <span class="math inline">\(\text{Post}(p_{\text{new}}) \geq \text{Post}(p_t), \text{ then } p_{t+1} = p_{\text{new}}\)</span>.</li>
+<li class="fragment">Else, accept <span class="math inline">\(p_{\text{new}}\)</span> with probability <span class="math inline">\(\frac{\text{Post}(p_{\text{new}})}{\text{Post}(p_t)}\)</span>.</li>
+</ul></li>
+</ul>
+</div></div>
+</section>
+<section id="mcmc-gibbs-sampling" class="slide level2">
+<h2>MCMC: Gibbs sampling</h2>
+<ul>
+<li class="fragment"><p>Sampling <span class="math inline">\(\theta_1\)</span>, <span class="math inline">\(\theta_2\)</span> jointly is hard: <span class="math inline">\(p(\theta_1, \theta_2 \mid \text{data}) \propto p(\text{data} \mid \theta_1, \theta_2) \times p(\theta_1, \theta_2)\)</span></p></li>
+<li class="fragment"><p>Instead, we sample <span class="math inline">\(\theta_1\)</span> and <span class="math inline">\(\theta_2\)</span> sequentially:</p>
+<ul>
+<li class="fragment"><p><span class="math inline">\(p(\theta_1 \mid \theta_2, \text{data}) \propto p(\text{data} \mid \theta_1, \theta_2) \times p(\theta_1  \mid \theta_2)\)</span></p></li>
+<li class="fragment"><p><span class="math inline">\(p(\theta_2 \mid \theta_1, \text{data}) \propto p(\text{data} \mid \theta_1, \theta_2) \times p(\theta_2  \mid \theta_1)\)</span></p></li>
+<li class="fragment"><p><span class="math inline">\(\theta_1^{(t)} \sim p(\theta_1 \mid \theta^{(t-1)}_2, \text{data})\)</span></p></li>
+<li class="fragment"><p><span class="math inline">\(\theta_2^{(t)} \sim p(\theta_2 \mid \theta^{(t)}_1, \text{data})\)</span></p></li>
+</ul></li>
+<li class="fragment"><p>Gibbs sampling approximates the joint posterior by sampling from these full conditionals.</p></li>
+<li class="fragment"><p>Implemented in <strong>BUGS</strong> and <strong>JAGS</strong> software.</p></li>
+</ul>
+</section>
+<section id="mcmc-hamiltonian-monte-carlo-hmc" class="slide level2">
+<h2>MCMC: Hamiltonian Monte Carlo (HMC)</h2>
+<div class="columns">
+<div class="column" style="width:40%;">
+<p><img data-src="images/pot_eng.gif"></p>
+<p><img data-src="images/traj.gif"></p>
+</div><div class="column" style="width:60%;">
+<ul>
+<li class="fragment"><p><span class="math inline">\(H(\theta, r) = U(\theta) + r^2/2\)</span> (Hamitonian: potential energy + kinetic energy = constant)</p>
+<ul>
+<li class="fragment"><span class="math inline">\(U(\theta) = -\text{log}\; p(\theta \mid \text{data})\)</span></li>
+</ul></li>
+<li class="fragment"><p>Instead of sampling from <span class="math inline">\(p(\theta \mid \text{data})\)</span>, HMC samples from a joint distribution over both <span class="math inline">\(\theta\)</span> and <span class="math inline">\(r\)</span>.</p>
+<ul>
+<li class="fragment"><span class="math inline">\(p(\theta \mid \text{data}) \propto \int \text{exp}(-H(\theta, r))dr\)</span></li>
+</ul></li>
+<li class="fragment"><p>It’s equivalent to sampling from <span class="math inline">\(p(\theta \mid \text{data}) \propto \text{exp}(-U(\theta))\)</span>.</p></li>
+<li class="fragment"><p>HMS explores very different <span class="math inline">\(\theta\)</span> along the same trajectory (i.e.&nbsp;leapfrog path), which is much more efficient than random sampling.</p></li>
+</ul>
+</div></div>
+</section>
+<section id="mcmc-hamiltonian-monte-carlo-hmc-1" class="slide level2">
+<h2>MCMC: Hamiltonian Monte Carlo (HMC)</h2>
+<div class="columns">
+<div class="column" style="width:30%;">
+<p><img data-src="images/leapfrog.gif"></p>
+<p><img data-src="images/hmc.gif"></p>
+</div><div class="column" style="width:70%;">
+<ul>
+<li><p>Within each iteration, HMC simulates a trajectory using leapfrog steps.</p>
+<ul>
+<li>No-U-Turn Sampler (NUTS) dynamically determines the number of leapfrog steps; we only need to set the maximum (e.g., <code>max_treedepth</code> in <strong>Stan</strong>).</li>
+</ul></li>
+<li><p>The Hamiltonian stays the same, but momentum <span class="math inline">\(r\)</span> is resampled each iteration.</p></li>
+<li><p>Only the final parameter <span class="math inline">\(\theta\)</span> of each trajectory is kept as a posterior sample.</p></li>
+</ul>
+</div></div>
+</section>
+<section id="mcmc-methods-comparison" class="slide level2">
+<h2>MCMC Methods: Comparison</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 24%">
+<col style="width: 28%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th><strong>Metropolis(-Hastings)</strong></th>
+<th><strong>Gibbs Sampling</strong></th>
+<th><strong>Hamiltonian Monte Carlo (HMC)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>How it works</td>
+<td>Try random moves, accept/reject</td>
+<td>Update one parameter at a time</td>
+<td>Simulate smooth movement using gradients</td>
+</tr>
+<tr class="even">
+<td>Efficient in high dimensions?</td>
+<td>❌ Often slow</td>
+<td>✅ If math is simple</td>
+<td>✅ Very efficient</td>
+</tr>
+<tr class="odd">
+<td>Flexible?</td>
+<td>✅ Yes</td>
+<td>❌ No (conjugate priors)</td>
+<td>✅ Yes</td>
+</tr>
+<tr class="even">
+<td>Typical software</td>
+<td>JAGS, custom R</td>
+<td>JAGS, BUGS</td>
+<td>Stan</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="stan-a-modern-languagesoftware-for-bayesian-modeling" class="slide level2">
+<h2>Stan: A modern language/software for Bayesian modeling</h2>
+<div class="columns">
+<div class="column" style="width:35%;">
+<p><img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo.png" width="250" alt="Stan Logo"></p>
+<div class="cell" data-layout-align="center" data-output.var="bernoulli">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource stan number-lines code-with-copy"><code class="sourceCode stan"><span id="cb14-1"><a href=""></a><span class="kw">data</span> {</span>
+<span id="cb14-2"><a href=""></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; N;</span>
+<span id="cb14-3"><a href=""></a>  <span class="dt">array</span>[N] <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>, <span class="kw">upper</span>=<span class="dv">1</span>&gt; y;</span>
+<span id="cb14-4"><a href=""></a>}</span>
+<span id="cb14-5"><a href=""></a><span class="kw">parameters</span> {</span>
+<span id="cb14-6"><a href=""></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>, <span class="kw">upper</span>=<span class="dv">1</span>&gt; theta;</span>
+<span id="cb14-7"><a href=""></a>}</span>
+<span id="cb14-8"><a href=""></a><span class="kw">model</span> {</span>
+<span id="cb14-9"><a href=""></a>  <span class="co">// uniform prior on interval 0,1</span></span>
+<span id="cb14-10"><a href=""></a>  theta ~ beta(<span class="dv">1</span>, <span class="dv">1</span>);</span>
+<span id="cb14-11"><a href=""></a>  <span class="co">// likelihood</span></span>
+<span id="cb14-12"><a href=""></a>  y ~ bernoulli(theta);</span>
+<span id="cb14-13"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div><div class="column" style="width:65%;">
+<ul>
+<li class="fragment"><p>🧑🏻‍💻 <strong>Bayesian Modeling</strong></p>
+<ul>
+<li class="fragment">Stan uses the No-U-Turn sampler (NUTS), a variant of Hamiltonian Monte Carlo (HMC), which is efficient for complex models with many parameters.</li>
+</ul></li>
+<li class="fragment"><p>⚙️ <strong>Flexible and Scalable</strong></p>
+<ul>
+<li class="fragment">You can use Stan for many types of models, from simple regressions to multi-level models including time-series, spatial, SEM, and more.</li>
+</ul></li>
+<li class="fragment"><p>💻 <strong>Multiplatform</strong></p>
+<ul>
+<li class="fragment">Stan works with R, Python, Julia, and more. It also has tools for checking models and making visualizations.</li>
+</ul></li>
+</ul>
+</div></div>
+</section>
+<section id="interfaces-to-stan-for-r-users" class="slide level2">
+<h2>Interfaces to Stan (for R users)</h2>
+<ul>
+<li>Stan: The acutal modeling and inference engine, written in C++.</li>
+</ul>
+<ul>
+<li class="fragment"><p>CmdStan: Command line interface (you write Stan code and run it via terminal).</p></li>
+<li class="fragment"><p><code>rstan</code>, <code>cmdstanr</code>: R interface to Stan/Cmdstan (you write Stan code and run it within R).</p></li>
+<li class="fragment"><p><code>brms</code>, <code>rstanarm</code>: Higher-level R packages that depend on <code>rstan</code> (you write R code and run models within R, without writing Stan code).</p></li>
+<li class="fragment"><p>In this course, we will use <code>cmdstanr</code> and <code>brms</code>.</p></li>
+</ul>
+<div class="footer">
+<p>CmdStan uses the latest version of Stan, whereas <code>rstan</code> is based on an older version.</p>
+</div>
+<ul>
+<li><p>Bayesian Estimation of Simple Models (with Stan)</p></li>
+<li><p>Bayesian Estimation of Multilevel Models (with Stan)</p></li>
 </ul>
 </section>
 <section id="references" class="slide level2">
@@ -2095,6 +1944,8 @@ p(\theta) \propto \int exp(-H(\theta, r))dr \propto exp(-H(\theta))
 
         // Factor of the display size that should remain empty around the content
         margin: 0.1,
+
+        maxScale: 1,
 
         math: {
           mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
