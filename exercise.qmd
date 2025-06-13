@@ -34,7 +34,10 @@ library(brms)
 library(cmdstanr)
 library(tidyverse)
 library(bayesplot)
+library(patchwork)
 cmdstanr::set_cmdstan_path("/opt/cmdstan/cmdstan-2.36.0")
+
+theme_set(theme_bw())
 ```
 
 
@@ -385,14 +388,14 @@ summary(lm_fit_brm)
 
 # Varying intercepts
 
-Leaf nitrogen contents increase with soil nitrogen concentration, but the baseline leaf nitrogen contents differ among species.
+There is a power-law relationship ($y =\beta_0x^{\beta_1}$) between tree diameter (DBH) and tree maximum height, and the scaling factor $\beta_0$ varies among species.
 
 $$
-y_{ij} \sim N(\beta_{0j} + \beta_1 x_{i}, \sigma)
+\text{log}\; y_{ij} \sim N(\text{log}\; \beta_{0j} + \beta_1 x_{i}, \sigma)
 $$
 
 $$
-\beta_{0j} \sim N(\hat{\beta_0}, \tau)
+\text{log}\; \beta_{0j} \sim N(\text{log}\;\hat{\beta_0}, \tau)
 $$
 
 $$
@@ -406,48 +409,165 @@ $$
 
 ## dummy data
 
-```{r}
+```{r, fig.height=6}
+set.seed(12345)
 
-library(tidyverse)
+n_sp <- 5
+n_rep <- 20
+wd <- rnorm(n_sp, 0, 1)
+gamma0 <- 0.6
+gamma1 <- 0.1
+sigma_y <- 0.1
 
-set.seed(123)
+b1_hat <- gamma1 * wd + gamma0
+b1 <- rnorm(n_sp, b1_hat, 0.01)
+log_b0 <- rnorm(n_sp, 0.55, 0.05)
 
-# ---- Define parameters ----
-J              <- 6     # number of species
-n_per_species  <- 25    # individuals per species
-true_beta1     <- 0.8   # true slope for nitrogen effect
-true_sigma     <- 1.5   # residual SD
-
-# Hyperpriors
-hat_beta0      <- rnorm(1, 0, 2.5)       # grand intercept ~ N(0,2.5)
-tau            <- abs(rcauchy(1, 0, 1))  # species‐sd ~ Half‐Cauchy(0,1)
-
-# Draw species‐level intercepts
-beta0_j <- rnorm(J, mean = hat_beta0, sd = tau)
-
-# Optional: assign real species names
-species_names <- paste0("Sp", LETTERS[1:J])
-
-# ---- Simulate data ----
-dummy_data <- tibble(
-  species  = factor(rep(species_names, each = n_per_species)),
-  nitrogen = rnorm(J * n_per_species, mean = 4, sd = 1.5)  # soil N
-) %>%
+# ---- simulate ----
+allo_df <- tibble(
+  sp     = factor(rep(paste0("sp", 1:n_sp), each = n_rep)),
+  wd  = rep(wd, each = n_rep),
+  # now log_xx ~ Normal(mean log‐dbh, sd
+  log_xx = rnorm(n_sp * n_rep, mean = log(40), sd = 0.5)) |>
   mutate(
-    # map each species to its intercept
-    beta0 = beta0_j[as.integer(species)],
-    # generate the response (leaf area)
-    leaf_area = rnorm(n(), mean = beta0 + true_beta1 * nitrogen, sd = true_sigma)
-  ) %>%
-  select(species, nitrogen, leaf_area)
+    # add observation‐level noise on log‐height
+    log_y = rnorm(
+      n(),
+      log_b0[as.integer(sp)] + b1[as.integer(sp)] * log_xx,
+      sigma_y),
+    dbh = exp(log_xx),
+    h = exp(log_y)) |>
+  select(sp, wd, dbh, h)
 
-# ---- Glimpse ----
-dummy_data %>%
-  group_by(species) %>%
-  summarise(
-    mean_leaf_area = mean(leaf_area),
-    sd_leaf_area   = sd(leaf_area)
-  )
+dbh_hist <- allo_df |>
+  ggplot(aes(dbh)) +
+  geom_histogram() +
+  xlab("DBH (cm)") +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 24)
+    )
+
+h_hist <- allo_df |>
+  ggplot(aes(h)) +
+  geom_histogram() +
+  xlab("Height (m)") +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 24)
+    )
+
+p1 <- allo_df |>
+  ggplot(aes(x = dbh, y = h, col = sp)) +
+  geom_point() +
+  xlab("DBH (cm)") +
+  ylab(expression("Height (m)")) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 24)
+    )
+
+p2 <- p1 +
+  scale_x_log10() +
+  scale_y_log10()
+
+# p3 <- tmp2 |>
+#   ggplot(aes(x = x, y = y, col = sp)) +
+#   geom_smooth(method = "lm", se = TRUE, lty = 2,
+#     alpha = 0.2,
+#     linewidth = 0.5, col = "black") +
+#   geom_point(size = 3) +
+#   xlab("Wood density") +
+#   ylab("b") +
+#   theme(legend.position = "none")
+
+dbh_hist + h_hist + p1 + p2
+```
+
+```{r}
+allo_list <- list(
+  log_h = log(allo_df$h),
+  log_dbh = log(allo_df$dbh),
+  sp = as.integer(allo_df$sp),
+  N = nrow(allo_df),
+  J = allo_df$sp |> unique() |> length()
+)
+```
+
+
+## Stan
+
+`stan/vint.stan`
+
+```{r, echo=FALSE, results='asis'}
+cat("```stan\n", paste(readLines("stan/vint.stan"), collapse = "\n"), "\n```")
+```
+
+```{r vint-model}
+vint_mod <- cmdstan_model("stan/vint.stan")
+
+vint_fit <- vint_mod$sample(
+  data = allo_list,
+  seed = 123,
+  chains = 4,
+  parallel_chains = 4,
+  iter_warmup = 1000, # number of warmup iterations
+  iter_sampling = 1000, # number of sampling iterations
+  refresh = 0 # don't print update
+)
+
+vint_fit$summary()
+vint_fit$diagnostic_summary()
+```
+
+## brms
+
+```{r vint-brm}
+priors <- c(
+  prior(normal(0, 2.5), class = Intercept),   # μₐ ~ N(0,2.5)
+  prior(normal(0, 2.5),   class = b),           # β₁ ~ N(0,2.5)
+  prior(cauchy(0, 1),   class = sd),          # τ  ~ Half–Cauchy(0,1)
+  prior(cauchy(0, 1),   class = sigma)        # σ  ~ Half–Cauchy(0,1)
+)
+
+vint_fit_brm <- brm(
+  log(h) ~ log(dbh) + (1 | sp),
+  family = gaussian(),
+  data = allo_df,
+  prior = priors,
+  refresh = 0 # don't print update
+)
+
+summary(vint_fit_brm)
+
+print(vint_fit_brm)
+plot(vint_fit_brm)
+pp_check(vint_fit_brm)
+```
+
+
+## lme4
+
+```{r vint-lme4}
+vint_fit_lme <- lme4::lmer(
+  log(h) ~ log(dbh) + (1 | sp),
+  data = allo_df)
+
+summary(vint_fit_lme)
+```
+
+# Reparameterization for multilevel model
+
+
+
+
 # Varying slopes and intercepts
+
+
+
+
 
 # Varying slopes and intercepts, and group-level predictors
