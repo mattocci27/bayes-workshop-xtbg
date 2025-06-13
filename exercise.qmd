@@ -29,19 +29,7 @@ knitr::opts_chunk$set(
 ```
 
 
-- Normal model
-
-- Poisson model
-
-- Multiple linear regression
-
-- Varying intercepts
-
-- Varying slopes and intercepts
-
-- Varying slopes and intercepts, and group-level predictors
-
-```{r}
+```{r setup, mesasge=FALSE, warning=FALSE}
 library(brms)
 library(cmdstanr)
 library(tidyverse)
@@ -84,12 +72,14 @@ normal_df <- tibble(
 
 `stan/normal.stan`
 
-```{stan, output.var="normal",file='stan/normal.stan', eval=FALSE, echo=TRUE}
+```{r, echo=FALSE, results='asis'}
+cat("```stan\n", paste(readLines("stan/normal.stan"), collapse = "\n"), "\n```")
 ```
 
 `stan/normal_vague.stan`
 
-```{stan, output.var="normal_vague",file='stan/normal_vague.stan', eval=FALSE, echo=TRUE}
+```{r, echo=FALSE, results='asis'}
+cat("```stan\n", paste(readLines("stan/normal_vague.stan"), collapse = "\n"), "\n```")
 ```
 
 ```{r}
@@ -265,12 +255,14 @@ pois_df <- tibble(
 
 `stan/pois.stan`
 
-```{stan, output.var="pois",file='stan/pois.stan', eval=FALSE, echo=TRUE}
+```{r, echo=FALSE, results='asis'}
+cat("```stan\n", paste(readLines("stan/pois.stan"), collapse = "\n"), "\n```")
 ```
 
 `stan/pois_re.stan`
 
-```{stan, output.var="pois_re",file='stan/pois_re.stan', eval=FALSE, echo=TRUE}
+```{r, echo=FALSE, results='asis'}
+cat("```stan\n", paste(readLines("stan/pois_re.stan"), collapse = "\n"), "\n```")
 ```
 
 ```{r}
@@ -353,8 +345,10 @@ lm_df <- tibble(
 
 `stan/lm.stan`
 
-```{stan, output.var="lm",file='stan/lm.stan', eval=FALSE, echo=TRUE}
+```{r, echo=FALSE, results='asis'}
+cat("```stan\n", paste(readLines("stan/lm.stan"), collapse = "\n"), "\n```")
 ```
+
 ```{r lm-model}
 lm_mod <- cmdstan_model("stan/lm.stan")
 
@@ -391,6 +385,8 @@ summary(lm_fit_brm)
 
 # Varying intercepts
 
+Leaf nitrogen contents increase with soil nitrogen concentration, but the baseline leaf nitrogen contents differ among species.
+
 $$
 y_{ij} \sim N(\beta_{0j} + \beta_1 x_{i}, \sigma)
 $$
@@ -408,6 +404,50 @@ $$
 $$
 
 
-```{r}
-```
+## dummy data
 
+```{r}
+
+library(tidyverse)
+
+set.seed(123)
+
+# ---- Define parameters ----
+J              <- 6     # number of species
+n_per_species  <- 25    # individuals per species
+true_beta1     <- 0.8   # true slope for nitrogen effect
+true_sigma     <- 1.5   # residual SD
+
+# Hyperpriors
+hat_beta0      <- rnorm(1, 0, 2.5)       # grand intercept ~ N(0,2.5)
+tau            <- abs(rcauchy(1, 0, 1))  # species‐sd ~ Half‐Cauchy(0,1)
+
+# Draw species‐level intercepts
+beta0_j <- rnorm(J, mean = hat_beta0, sd = tau)
+
+# Optional: assign real species names
+species_names <- paste0("Sp", LETTERS[1:J])
+
+# ---- Simulate data ----
+dummy_data <- tibble(
+  species  = factor(rep(species_names, each = n_per_species)),
+  nitrogen = rnorm(J * n_per_species, mean = 4, sd = 1.5)  # soil N
+) %>%
+  mutate(
+    # map each species to its intercept
+    beta0 = beta0_j[as.integer(species)],
+    # generate the response (leaf area)
+    leaf_area = rnorm(n(), mean = beta0 + true_beta1 * nitrogen, sd = true_sigma)
+  ) %>%
+  select(species, nitrogen, leaf_area)
+
+# ---- Glimpse ----
+dummy_data %>%
+  group_by(species) %>%
+  summarise(
+    mean_leaf_area = mean(leaf_area),
+    sd_leaf_area   = sd(leaf_area)
+  )
+# Varying slopes and intercepts
+
+# Varying slopes and intercepts, and group-level predictors

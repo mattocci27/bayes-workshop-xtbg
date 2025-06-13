@@ -289,8 +289,7 @@
 <h3 id="modeling-with-stan">🧑🏻‍💻Modeling with Stan</h3>
 <ul>
 <li><p>Tools for Bayesian Modeling</p></li>
-<li><p>Bayesian Estimation of Simple Models (with Stan)</p></li>
-<li><p>Bayesian Estimation of Multilevel Models (with Stan)</p></li>
+<li><p>Stan Coding Session (separate HTML material)</p></li>
 </ul>
 </div></div>
 </section>
@@ -1332,8 +1331,8 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
           display:block!important;
       }</style></aside>
 </section>
-<section id="more-realistic-estimates-multilevel-models" class="slide level2">
-<h2>More realistic estimates: Multilevel models</h2>
+<section id="more-realistic-estimates-multilevel-models-partial-pooling" class="slide level2">
+<h2>More realistic estimates: Multilevel models — partial pooling</h2>
 <ul>
 <li><p><span class="math inline">\(S_i \sim \mathcal{B}(N_i, p_i)\)</span>: Likelihood</p></li>
 <li><p><span class="math inline">\(\mathrm{logit}(p_i) \sim \mathcal{N}(\mu, \sigma)\)</span>: Group-level model (hierarchical prior)</p></li>
@@ -1389,8 +1388,8 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
           display:block!important;
       }</style></aside>
 </section>
-<section id="multilevel-models-yield-better-estimates" class="slide level2">
-<h2>Multilevel models yield better estimates</h2>
+<section id="better-estimates-via-partial-pooling-bayesian-multilevel-model-vs.-mle-separate-fits" class="slide level2">
+<h2>Better estimates via partial pooling (Bayesian multilevel model vs.&nbsp;MLE separate fits)</h2>
 <div class="columns">
 <div class="column" style="width:40%;">
 <div class="cell" data-layout-align="center">
@@ -1541,6 +1540,28 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
+</section>
+<section id="summary" class="slide level2">
+<h2>Summary</h2>
+<ul>
+<li><p><em>Why Bayesian estimation is useful</em>.</p></li>
+<li><p><em>Why multilevel models are important</em>.</p></li>
+</ul>
+<ul>
+<li class="fragment"><strong>Bayesian workflow = Likelihood + Prior → Posterior</strong>
+<ul>
+<li class="fragment">One clear pipeline for fitting, checking, and predicting.</li>
+</ul></li>
+<li class="fragment"><strong>Priors = ecological knowledge</strong>
+<ul>
+<li class="fragment">Weakly informative priors stabilize small data sets.</li>
+<li class="fragment">Hierarchical priors share information across species, time, sites, etc.</li>
+</ul></li>
+<li class="fragment"><strong>Multilevel models are the default in ecology</strong>
+<ul>
+<li class="fragment">Ecology is hierarchical (individual → population → community); Bayesian tools handle this naturally.</li>
+</ul></li>
+</ul>
 </section></section>
 <section>
 <section id="tools-for-bayesian-modeling" class="title-slide slide level1 center">
@@ -1736,21 +1757,21 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="footer">
 <p>CmdStan uses the latest version of Stan, whereas <code>rstan</code> is based on an older version.</p>
 </div>
-<ul>
-<li><p>Bayesian Estimation of Simple Models (with Stan)</p></li>
-<li><p>Bayesian Estimation of Multilevel Models (with Stan)</p></li>
-</ul>
 </section>
 <section id="references" class="slide level2">
 <h2>References</h2>
 <ul>
+<li><p>Slides &amp; code: <a href="https://github.com/mattocci27/bayes-workshop-xtbg" class="uri">https://github.com/mattocci27/bayes-workshop-xtbg</a></p></li>
 <li><p><a href="http://www.stat.columbia.edu/~gelman/book/">Gelman, A. et al.&nbsp;Bayesian Data Analysis, Third Edition. (Chapman &amp; Hall/CRC, 2013)</a></p></li>
 <li><p><a href="https://mc-stan.org/docs/stan-users-guide/index.html">Stan User’s Guide</a></p></li>
 <li><p><a href="https://mc-stan.org/docs/functions-reference/index.html">Stan Functions Reference</a></p></li>
 <li><p><a href="https://youtu.be/mX_NpDD7wwg">AIcia Solid Project</a> (in Japanese and Math)</p></li>
 </ul>
-
 </section></section>
+<section id="stan-coding-session-separate-html-material" class="title-slide slide level1 center">
+<h1>Stan Coding Session (separate HTML material)</h1>
+
+</section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <p><img src="images/xtbg_logo.png" class="slide-logo"></p>

@@ -1,1 +1,8 @@
+# Compiled Object files without extensions
+*
+!*/
+!*.*
+
 *.key
+*_files
+*_cache

@@ -110,9 +110,7 @@ hoge
 
 - Tools for Bayesian Modeling
 
-- Bayesian Estimation of Simple Models (with Stan)
-
-- Bayesian Estimation of Multilevel Models (with Stan)
+- Stan Coding Session (separate HTML material)
 
 :::
 :::
@@ -789,51 +787,6 @@ $$
 
 ---
 
-<!-- ## Forward and Inverse Problems
-
-
-::: columns
-::: {.column width="50%"}
-::: incremental
-- X: 3 red balls, 5 white balls
-
-- Y: 1 red balls, 3 white balls
-
-- Randomly choose a bag X or Y
-
-- $P(A)$: [Choosing X]{.blue}
-
-- $P(B)$: [Drawing a red ball]{.blue}
-
-- $P(B \mid A)$: [Getting a red ball from X]{.blue}
-
-- $P(A \cap B)$: [Choosing X and drawing a red ball]{.blue}
-
-- $P(A \mid B)$: [Picked X, because you got a red ball(?)]{.orange}
-:::
-:::
-
-::: {.column width="50%"}
-
-::: incremental
-- $P(A) = 1/2$
-
-- $P(B \mid A) = 3/8$
-
-- $P(B)$ = 1/2 $\times$ 3/8 + 1/2 $\times$ 1/4 = 5 /16
-
-- $P(A \cap B)$ = 1/2 $\times$ 3/8 = 3/16
-
-- $P(A \mid B)$ = $P(A \cap B) / P(B)$ = (3/16) / (5/16) = 3/5
-:::
-:::
-:::
-
-::: notes
-- Best example seems to be bags and balls
-
-- When you got a red ball, which bag did you choose?
-::: -->
 
 ## Forward and Inverse Problems: PCR and disease example
 
@@ -1368,7 +1321,7 @@ We know `p_true` because we generated this data using `p_true` as a known parame
 
 ---
 
-## More realistic estimates: Multilevel models
+## More realistic estimates: Multilevel models — partial pooling
 
 - $S_i \sim \mathcal{B}(N_i, p_i)$: Likelihood
 
@@ -1469,7 +1422,7 @@ p4 / p5 / p6
 - sigma = 10 -> +/- 49.99%
 :::
 
-## Multilevel models yield better estimates
+## Better estimates via partial pooling (Bayesian multilevel model vs. MLE separate fits)
 
 ::: columns
 ::: {.column width="40%"}
@@ -1485,7 +1438,7 @@ dummy_simple_re |>
 
 ::: {.column width="60%"}
 
-```{r, fig.height=5}
+```{r, fig.height=4.5}
 dummy_simple_re |>
   pivot_longer(c(p_like, p_bayes)) |>
   ggplot(aes(x = p_true, y = value, fill = name)) +
@@ -1557,6 +1510,26 @@ $\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\mathcal{N}(\mu \mid 0, 2.5) 
 
 ::: notes
 posterior distribution is proportional to the likelihood times the prior
+:::
+
+## Summary
+
+- *Why Bayesian estimation is useful*.
+
+- *Why multilevel models are important*.
+
+::: incremental
+
+- **Bayesian workflow = Likelihood + Prior → Posterior**
+  - One clear pipeline for fitting, checking, and predicting.
+
+- **Priors = ecological knowledge**
+  - Weakly informative priors stabilize small data sets.
+  - Hierarchical priors share information across species, time, sites, etc.
+
+- **Multilevel models are the default in ecology**
+  - Ecology is hierarchical (individual → population → community); Bayesian tools handle this naturally.
+
 :::
 
 
@@ -1802,134 +1775,10 @@ ggplot(samples_long, aes(x = iter, y = value, color = param)) +
 CmdStan uses the latest version of Stan, whereas `rstan` is based on an older version.
 :::
 
-# more
-
-- Bayesian Estimation of Simple Models (with Stan)
-
-- Bayesian Estimation of Multilevel Models (with Stan)
-
-<!-- ## Stan code for a simple multilevel logistic model (non-verbal model){.small}
-
-::: columns
-::: {.column width="50%"}
-
-```{stan, output.var="simple_logistic",file=here('stan/logistic.stan'), eval=FALSE, echo=TRUE}
-```
-
-:::
-
-::: {.column width="50%"}
-
-### Centered parameterization
-
-- $S_i \sim \mathcal{B}_{logit}(N_i, z_i)$: likelihood
-
-- $z_i \sim \mathcal{N}(\mu, \sigma)$ : prior
-
-- $\sigma \sim \mathcal{N}(0, 1)$: prior
-
-- $\mu \sim \mathcal{N}(0, 5)$: prior
-
-###  Non-Centered parameterization
-
-- $z_i = \mu + \sigma \cdot \tilde{z_i}$
-
-- $\tilde{z_i} \sim \mathcal{N}(0, 1)$: prior
-:::
-:::
-
---- -->
-
-
-<!-- ---
-
-## MLE vs. Bayesian estimation
-
-::: columns
-::: {.column width="50%"}
-
-Bayesian estimation (`stan`)
-```{stan, output.var="simple_logistic",file=here('stan/logistic.stan'), eval=FALSE, echo=TRUE}
-```
-:::
-::: {.column width="50%"}
-
-MLE (`lme4::glmer`)
-```{r, echo=TRUE}
-fit <- lme4::glmer(
-   cbind(suv, n - suv) ~  (1 | sp),
-   data = dummy_simple,
-   family = binomial)
-```
-::: incremental
-- We can do MLE for these kind of simple models.
-- When a model is complicated, MLE often does not work well.
-- Model flexibility for MLE is limited.
-:::
-:::
-:::
-
-::: notes
-- You need to rely on functions, such as `lme4::glmer`.
-:::
-
----
-
-## MLE vs. Bayesian estimation
-
-::: columns
-::: {.column width="50%"}
-
-Bayesian estimation (`brms`)
-```{r, echo=TRUE, eval=FALSE}
-fit <- brms::brm(
-  suv | trials(n) ~ 1 + (1 | sp),
-  data = dummy_simple,
-  family = binomial())
-```
-:::
-::: {.column width="50%"}
-
-MLE (`lme4::glmer`)
-```{r, echo=TRUE}
-fit <- lme4::glmer(
-   cbind(suv, n - suv) ~  (1 | sp),
-   data = dummy_simple,
-   family = binomial)
-```
-:::
-:::
-
-- Several packages, like `brms` and `rstanarm`, offer Bayesian estimation using syntax similar to `lme4`.
-
-::: notes
-- You need to rely on functions, such as `lme4::glmer`.
-:::
-
----
-
-
-## Summary
-
-::: incremental
-
-### Why Bayesian estimation is useful
-
-- We can use a priori information about parameters in our model
-
-- Models are flexible
-
-- MCMC works even if models are complicated
-
-### Why multilevel models are important
-
-- Multilevel models have a good balance between pooled estimates and separate estimates, which is useful for practical sample sizes
-
-- Multilevel models handle nested or hierarchical data structures, a common and important scenario in ecological research (e.g., trees within species, community within sites, etc.).
-
-::: -->
 
 ## References
+
+- Slides & code: <https://github.com/mattocci27/bayes-workshop-xtbg>
 
 - [Gelman, A. et al. Bayesian Data Analysis, Third Edition. (Chapman & Hall/CRC, 2013)](http://www.stat.columbia.edu/~gelman/book/)
 
@@ -1938,4 +1787,8 @@ fit <- lme4::glmer(
 - [Stan Functions Reference](https://mc-stan.org/docs/functions-reference/index.html)
 
 - [AIcia Solid Project](https://youtu.be/mX_NpDD7wwg) (in Japanese and Math)
+
+
+# Stan Coding Session (separate HTML material)
+
 
