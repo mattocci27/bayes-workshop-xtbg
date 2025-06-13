@@ -86,7 +86,7 @@ hoge
 - idea of Bayesian in ecology
 :::
 
-## Outline: From Likelihood to Hierachical Bayesian Models in Ecology
+## Outline: From Likelihood to Hierarchical Bayesian Models in Ecology
 
 
 ::: columns
@@ -284,7 +284,7 @@ tibble(x, y) |>
 :::
 
 ::: fragment
-NDD can maintain devisiety in communities by preventing common species from dominating the community.
+NDD can maintain diversity in communities by preventing common species from dominating the community.
 :::
 
 
