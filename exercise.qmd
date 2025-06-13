@@ -395,11 +395,11 @@ $$
 $$
 
 $$
-\text{log}\; \beta_{0j} \sim N(\text{log}\;\hat{\beta_0}, \tau)
+\text{log}\; \beta_{0j} \sim N(\mu_0, \tau)
 $$
 
 $$
-\hat{\beta_0} \sim N(0, 2.5)
+\mu_0 \sim N(0, 2.5)
 $$
 
 $$
@@ -409,10 +409,13 @@ $$
 
 ## dummy data
 
+- We simulate a dataset with 10 species and 20 trees per species.
+- Each species has wood density (wd) values.
+
 ```{r, fig.height=6}
 set.seed(12345)
 
-n_sp <- 5
+n_sp <- 10
 n_rep <- 20
 wd <- rnorm(n_sp, 0, 1)
 gamma0 <- 0.6
@@ -527,10 +530,10 @@ vint_fit$diagnostic_summary()
 
 ```{r vint-brm}
 priors <- c(
-  prior(normal(0, 2.5), class = Intercept),   # μₐ ~ N(0,2.5)
-  prior(normal(0, 2.5),   class = b),           # β₁ ~ N(0,2.5)
-  prior(cauchy(0, 1),   class = sd),          # τ  ~ Half–Cauchy(0,1)
-  prior(cauchy(0, 1),   class = sigma)        # σ  ~ Half–Cauchy(0,1)
+  prior(normal(0, 2.5), class = Intercept),
+  prior(normal(0, 2.5),   class = b),
+  prior(cauchy(0, 1),   class = sd),
+  prior(cauchy(0, 1),   class = sigma)
 )
 
 vint_fit_brm <- brm(
@@ -565,6 +568,8 @@ summary(vint_fit_lme)
 
 ## Eight schools example
 
+What is the effect of the treatment (a new education method) on students' scores for each school and across schools?
+
 ```{r, echo=FALSE, message=FALSE}
 # Eight schools estimates and standard errors
 y     <- c(28,  8, -3,  7, -1,  1, 18, 12)
@@ -581,15 +586,15 @@ schools_dat <- list(
 )
 
 # (Optionally) also create a data frame for quick inspection / plotting
-schools_df <- data.frame(
+schools_df <- tibble(
   school = paste0("School_", 1:J),
   y      = y,
   sigma  = sigma
 )
 
 # Inspect
-# print(schools_dat)
-print(schools_df)
+# print(shools_dt)
+schools_df |> kableExtra::kbl()
 ```
 
 
@@ -611,9 +616,9 @@ $$
 \tau \sim \text{Half-Cauchy}(0, 2.5)
 $$
 
-Note: $\sigma_j$ is known constant (i.e., data), we don't have to estimate it.
+*Note: $\sigma_j$ is known constant (i.e., data), we don't have to estimate it.*
 
-This parameterization is the default in Stan and `brms`, but it can lead to problems with convergence, especially in hierarchical models.
+This parameterization is intuitive, but it often leads to convergence issues in hierarchical models.
 
 ## Non-centered parameterization
 
@@ -631,6 +636,199 @@ We often use this parameterization when we have hierarchical models with varying
 
 # Varying slopes and intercepts
 
+There is a power-law relationship ($y =\beta_0 x^{\beta_1}$) between tree diameter (DBH) and tree maximum height, and both the scaling factor $\beta_0$ and the expoent $\beta_1$ vary among species.
 
+$$
+\text{log}\; y_{ij} \sim N(\text{log}\; \beta_{0j} + \beta_{1j} x_{ij}, \sigma)
+$$
+
+$$
+\begin{bmatrix}
+\text{log}\; \beta_{0j} \\
+\beta_{1j}
+\end{bmatrix}
+\sim
+\mathrm{MVN}
+\Biggl(
+\begin{bmatrix}
+\mu_{0} \\
+\mu_{1}
+\end{bmatrix},
+\begin{bmatrix}
+\sigma_{0}^2  & \rho \sigma_{0} \sigma_{1} \\
+\rho \sigma_{0} \sigma_{1} & \sigma_{1}^2
+\end{bmatrix}
+\Biggr)
+$$
+
+## Centered parameterization
+
+
+$$
+\boldsymbol\mu \sim N(0, 2.5)
+$$
+
+$$
+\boldsymbol\Sigma \sim \mathcal{W}^{-1}_p(\nu,\,\Psi)
+$$
+
+This parameterization using inverse-whishart distribution $\mathcal{W}^{-1}$ is **not recommended** for hierarchical models with varying slopes and intercepts.
+
+## Non-Centered parameterization
+
+[Optimization through Cholesky factorization](https://mc-stan.org/docs/stan-users-guide/regression.html#hierarchical-priors.section)
+
+$$
+\boldsymbol z_j \sim \mathcal{N}(\mathbf0,\,I_2)
+$$
+$$
+\begin{pmatrix}\log\beta_{0j}\\[3pt]\beta_{1j}\end{pmatrix}
+  = \boldsymbol\mu + L\, \boldsymbol z_j
+$$
+
+
+Some linear algebra (Cholesk decomposition):
+
+$$
+\Sigma \;=\;L\,L^\top
+\;=\;\bigl[\mathrm{diag}(\tau)\,L_\Omega\bigr]\,
+\bigl[L_\Omega^\top\,\mathrm{diag}(\tau)\bigr]
+\;=\;\mathrm{diag}(\tau)\,\Omega\,\mathrm{diag}(\tau).
+$$
+
+$$
+L_\Omega \sim \mathrm{LKJ\_Corr\_Cholesky}(2) \quad \text{or}  \quad \Omega \sim \mathrm{LKJ\_Corr}(2)
+$$
+$$
+\tau_i \sim \mathrm{Half\text{-}Cauchy}(0,1)
+$$
+
+
+Rather than sampling the correlation matix $\Omega$ directly, sampling the Cholesky factor $L_\Omega$ is computationally more efficient and numerically stable.
+
+In the LKJ(\eta) prior:
+
+- $\eta$ = 1 indicate flat prior (uniform distribution) over correlation matrices.
+
+- $\eta$  > 1 indicate weaker correlations.
+
+We usually use $\eta$  = 2 because we assume at leat weak correlations among the parameters, but still allow mooderate to strong cvorrelations.
+
+## Stan
+
+`stan/vslope.stan`
+
+```{r}
+cmdstanr::set_cmdstan_path("/opt/cmdstan/cmdstan-2.36.0")
+```
+
+```{r, echo=FALSE, results='asis'}
+cat("```stan\n", paste(readLines("stan/vslope.stan"), collapse = "\n"), "\n```")
+```
+
+```{r}
+allo_vslope_list <- list(
+  y = log(allo_df$h),
+  x = cbind(1, log(allo_df$dbh)),
+  jj = as.integer(allo_df$sp),
+  N = nrow(allo_df),
+  K = 2, # number of predictors (intercept + slope)
+  J = allo_df$sp |> unique() |> length(),
+  L = 1 # number of group-level predictors (intercept)
+)
+allo_vslope_list$u <- matrix(1, nrow = allo_vslope_list$L, ncol = allo_vslope_list$J)
+```
+
+```{r}
+vslope_mod <- cmdstan_model("stan/vslope.stan")
+
+vslope_fit <- vslope_mod$sample(
+  data = allo_vslope_list,
+  seed = 1234,
+  chains = 4,
+  parallel_chains = 4,
+  iter_warmup = 1000, # number of warmup iterations
+  iter_sampling = 1000, # number of sampling iterations
+  adapt_delta = 0.95, # increase adapt_delta to avoid divergent transitions
+  max_treedepth = 15, # increase max_treedepth to avoid max treedepth errors
+  refresh = 0 # don't print update
+)
+
+vslope_fit$summary()
+vslope_fit$diagnostic_summary()
+```
+
+## brms
+
+```{r vslope-brm}
+priors <- c(
+  prior(normal(0, 2.5), class = Intercept),
+  prior(normal(0, 2.5),   class = b),
+  prior(lkj(2), class = cor),                # Ω ~ LKJ(2)
+  prior(cauchy(0, 1),   class = sigma)
+)
+
+slope_fit_brm <- brm(
+  log(h) ~ log(dbh) + (log(dbh) | sp),
+  family = gaussian(),
+  data = allo_df,
+  prior = priors,
+  refresh = 0, # don't print update
+  control = list(
+    adapt_delta  = 0.95,  # default is 0.8
+    max_treedepth = 15    # default is 10
+  )
+)
+```
+
+**Divergent transitions!**
+We need to increase `adapt_delta` and `max_treedepth` to avoid divergent transitions.
+We may also need to change the priors.
+Reparameterization is less  straightforward in `brms` than writing your own Stan code.
+
+```{r}
+summary(slope_fit_brm)
+```
+
+
+## lme4
+
+```{r slope-lme4}
+slope_fit_lme <- lme4::lmer(
+  log(h) ~ log(dbh) + (log(dbh) | sp),
+  data = allo_df)
+```
+
+**Not convergent!**
+
+```{r}
+summary(slope_fit_lme)
+```
 
 # Varying slopes and intercepts, and group-level predictors
+
+There is a power-law relationship ($y =\beta_0 x^{\beta_1}$) between tree diameter (DBH) and tree maximum height, and both the scaling factor $\beta_0$ and the expoent $\beta_1$ vary among species.
+Those species variation can be explained by wood density of each species.
+
+$$
+\text{log}\; y_{ij} \sim N(\text{log}\; \beta_{0j} + \beta_{1j} x_{ij}, \sigma)
+$$
+
+$$
+\begin{bmatrix}
+\text{log}\; \beta_{0j} \\
+\beta_{1j}
+\end{bmatrix}
+\sim
+\mathrm{MVN}
+\Biggl(
+\begin{bmatrix}
+\mu_{0} \\
+\mu_{1}
+\end{bmatrix},
+\begin{bmatrix}
+\sigma_{0}^2  & \rho \sigma_{0} \sigma_{1} \\
+\rho \sigma_{0} \sigma_{1} & \sigma_{1}^2
+\end{bmatrix}
+\Biggr)
+$$

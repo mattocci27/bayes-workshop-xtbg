@@ -7,7 +7,7 @@ data {
 }
 
 parameters {
-  real        log_beta0_hat;         // grand mean of log(β₀)
+  real        mu0;         // grand mean of log(mu₀)
   real<lower=0> tau;            // SD of species intercepts
   vector[J]   log_beta0;            // species‐level intercepts = log(β₀ⱼ)
   real        beta1;            // common slope on log(DBH)
@@ -19,9 +19,9 @@ model {
   log_h ~ normal(log_beta0[sp] + beta1 * log_dbh, sigma);
 
   // Priors
-  log_beta0_hat ~ normal(0, 2.5);
+  mu0 ~ normal(0, 2.5);
   tau      ~ cauchy(0, 1);
-  log_beta0  ~ normal(log_beta0_hat, tau);
+  log_beta0  ~ normal(mu0, tau);
   beta1    ~ normal(0, 2.5);
   sigma    ~ cauchy(0, 1);
 }
