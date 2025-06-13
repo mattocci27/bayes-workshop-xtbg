@@ -559,14 +559,77 @@ vint_fit_lme <- lme4::lmer(
 summary(vint_fit_lme)
 ```
 
-# Reparameterization for multilevel model
+# Reparameterization for multilevel models
+
+[Diagnosing Biased Inference with Divergences](https://betanalpha.github.io/assets/case_studies/divergences_and_bias.html#3_a_non-centered_eight_schools_implementation) by Michael Betancourt
+
+## Eight schools example
+
+```{r, echo=FALSE, message=FALSE}
+# Eight schools estimates and standard errors
+y     <- c(28,  8, -3,  7, -1,  1, 18, 12)
+sigma <- c(15, 10, 16, 11,  9, 11, 10, 18)
+
+# Number of schools
+J <- length(y)
+
+# Pack into a list for Stan
+schools_dat <- list(
+  J     = J,
+  y     = y,
+  sigma = sigma
+)
+
+# (Optionally) also create a data frame for quick inspection / plotting
+schools_df <- data.frame(
+  school = paste0("School_", 1:J),
+  y      = y,
+  sigma  = sigma
+)
+
+# Inspect
+# print(schools_dat)
+print(schools_df)
+```
 
 
+## Centered parameterization
 
+$$
+y_j \sim \mathcal{N}\bigl(\theta_j,\;\sigma_j\bigr)
+$$
+
+$$
+\theta_j \sim \mathcal{N}\bigl(\mu,\;\tau \bigr)
+$$
+
+$$
+\mu \sim \mathcal{N}\bigl(0,\;5 \bigr)
+$$
+
+$$
+\tau \sim \text{Half-Cauchy}(0, 2.5)
+$$
+
+Note: $\sigma_j$ is known constant (i.e., data), we don't have to estimate it.
+
+This parameterization is the default in Stan and `brms`, but it can lead to problems with convergence, especially in hierarchical models.
+
+## Non-centered parameterization
+
+$$
+\tilde{\theta_j} \sim \mathcal{N}\bigl(0,\;1 \bigr)
+$$
+
+$$
+\theta_j = \mu + \tau \cdot \tilde{\theta_j}
+$$
+
+In this parameterization, we introduce a new latent variable $\tilde{\theta_j}$ that is independent of the other parameters.
+This allows the sampler to explore the posterior more efficiently and avoids problems with convergence.
+We often use this parameterization when we have hierarchical models with varying intercepts or slopes.
 
 # Varying slopes and intercepts
-
-
 
 
 
