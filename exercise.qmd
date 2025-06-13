@@ -1,5 +1,5 @@
 ---
-title: ""
+title: "Practical Bayesian Modeling with Stan and brms"
 author: "Masatoshi Katabuchi"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 fontsize: 12pt
@@ -12,6 +12,8 @@ format:
     smooth-scroll: true
     standalone: true
     embed-resources: true
+execute:
+  cache: true
 ---
 
 ```{r global_options, include=FALSE}
@@ -189,10 +191,21 @@ normal_fit$diagnostic_summary()
 
 ## `brms`
 
-```{r}
-normal_fit_brm <- brm(y ~ 1, family = gaussian(), data = normal_df)
+```{r, eval=FALSE}
+normal_fit_brm0 <- brm(y ~ 1, family = gaussian(), data = normal_df)
 ```
 
+```{r normal-brm}
+normal_fit_brm <- brm(
+  y ~ 1,
+  family = gaussian(),
+  data = normal_df,
+  prior = c(
+    prior(normal(0, 5), class = "Intercept"),
+    prior(cauchy(0, 2.5), class = "sigma")
+  )
+)
+```
 
 ### Summary
 
@@ -213,3 +226,188 @@ mcmc_hist(normal_draws_brm, pars = c("b_Intercept", "sigma"))
 ```
 
 ### Diagnostic summary
+
+```{r}
+rstan::check_hmc_diagnostics(normal_fit_brm$fit)
+```
+
+# Poisson model
+
+$$
+y_i \sim \text{Poisson}(\lambda_i)
+$$
+
+$$
+y_i \sim \operatorname{Poisson\_log}(\log \lambda_i)
+$$
+
+## Dummy data
+
+```{r}
+set.seed(123)
+n <-  100
+y <- rpois(n, lambda = 5)
+
+pois_list <- list(
+  y = y,
+  N = n
+)
+
+pois_df <- tibble(
+  y = y,
+  N = n
+)
+```
+
+<!-- poisson_mod <- cmdstan_model("stan/poisson.stan") -->
+
+## Stan
+
+`stan/pois.stan`
+
+```{stan, output.var="pois",file='stan/pois.stan', eval=FALSE, echo=TRUE}
+```
+
+`stan/pois_re.stan`
+
+```{stan, output.var="pois_re",file='stan/pois_re.stan', eval=FALSE, echo=TRUE}
+```
+
+```{r}
+pois_mod <- cmdstan_model("stan/pois.stan")
+pois_re_mod <- cmdstan_model("stan/pois_re.stan")
+```
+
+```{r}
+pois_fit <- pois_mod$sample(
+  data = pois_list,
+  seed = 123,
+  chains = 4,
+  parallel_chains = 4,
+  iter_warmup = 1000, # number of warmup iterations
+  iter_sampling = 1000, # number of sampling iterations
+  refresh = 0 # print update every 500 iters
+)
+```
+
+```{r}
+pois_re_fit <- pois_re_mod$sample(
+  data = pois_list,
+  seed = 123,
+  chains = 4,
+  parallel_chains = 4,
+  iter_warmup = 1000, # number of warmup iterations
+  iter_sampling = 1000, # number of sampling iterations
+  refresh = 0 # print update every 500 iters
+)
+```
+
+```{r}
+pois_fit$summary()
+```
+
+```{r}
+pois_re_fit$summary()
+```
+
+
+# Multiple linear model
+
+$$
+y_i \sim N(\beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i}, \sigma)
+$$
+
+or
+
+$$
+y_i \sim N(\boldsymbol{\beta \cdot x}, \sigma)
+$$
+
+
+```{r}
+set.seed(123)
+n <- 100
+beta <- c(2, 1.2, -0.8)
+x1 <- rnorm(n, mean = 0, sd = 1)
+x2 <- rnorm(n, mean = 0, sd = 1)
+sigma <- 0.4
+y <- rnorm(n, mean = beta[1] + beta[2] * x1 + beta[3] * x2, sd = sigma)
+```
+
+```{r}
+lm_list <- list(
+  y = y,
+  N = length(y),
+  x = rbind(1, x1, x2)
+)
+
+lm_df <- tibble(
+  y = y,
+  N = length(y),
+  x1 = x1,
+  x2 = x2
+)
+```
+
+## Stan
+
+`stan/lm.stan`
+
+```{stan, output.var="lm",file='stan/lm.stan', eval=FALSE, echo=TRUE}
+```
+```{r lm-model}
+lm_mod <- cmdstan_model("stan/lm.stan")
+
+lm_fit <- lm_mod$sample(
+  data = lm_list,
+  seed = 123,
+  chains = 4,
+  parallel_chains = 4,
+  iter_warmup = 1000, # number of warmup iterations
+  iter_sampling = 1000, # number of sampling iterations
+  refresh = 0 # don't print update
+)
+
+lm_fit$summary()
+```
+
+## brms
+
+```{r lm-brm}
+lm_fit_brm <- brm(
+  y ~ x1 + x2,
+  family = gaussian(),
+  data = lm_df,
+  prior = c(
+    prior(normal(0, 2.5), class = "Intercept"),
+    prior(normal(0, 2.5), class = "b"),
+    prior(cauchy(0, 2.5), class = "sigma")
+  ),
+  refresh = 0 # don't print update
+)
+
+summary(lm_fit_brm)
+```
+
+# Varying intercepts
+
+$$
+y_{ij} \sim N(\beta_{0j} + \beta_1 x_{i}, \sigma)
+$$
+
+$$
+\beta_{0j} \sim N(\hat{\beta_0}, \tau)
+$$
+
+$$
+\hat{\beta_0} \sim N(0, 2.5)
+$$
+
+$$
+\tau \sim \text{Half-Cauchy}(0, 1)
+$$
+
+
+```{r}
+```
+
