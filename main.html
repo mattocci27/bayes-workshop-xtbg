@@ -273,8 +273,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="outline-from-likelihood-to-hierachical-bayesian-models-in-ecology" class="slide level2">
-<h2>Outline: From Likelihood to Hierachical Bayesian Models in Ecology</h2>
+<section id="outline-from-likelihood-to-hierarchical-bayesian-models-in-ecology" class="slide level2">
+<h2>Outline: From Likelihood to Hierarchical Bayesian Models in Ecology</h2>
 <div class="columns">
 <div class="column">
 <h3 id="bayesian-foundations">🧠Bayesian Foundations</h3>
@@ -446,7 +446,7 @@
 <p>- Comita et al.&nbsp;2010 -</p>
 </div></div>
 <div class="fragment">
-<p>NDD can maintain devisiety in communities by preventing common species from dominating the community.</p>
+<p>NDD can maintain diversity in communities by preventing common species from dominating the community.</p>
 </div>
 <div class="footer">
 <p><a href="https://doi.org/10.1126/science.1190772">Comita <em>et al.</em> 2010 <em>Science</em></a></p>
@@ -865,7 +865,7 @@ P(A \mid B) = \frac{P(B \mid A) \times P(A)}{P(B)}
 </section>
 <section id="bayesian-update-with-prior-coin-toss" class="slide level2">
 <h2>Bayesian Update with Prior (Coin Toss)</h2>
-<p><span class="orange">Posteiror</span> <span class="math inline">\(\propto\)</span> <span class="teal">Likelihood</span> <span class="math inline">\(\times\)</span> <span class="purple">Prior</span></p>
+<p><span class="orange">Posterior</span> <span class="math inline">\(\propto\)</span> <span class="teal">Likelihood</span> <span class="math inline">\(\times\)</span> <span class="purple">Prior</span></p>
 <div class="columns">
 <div class="column" style="width:50%;">
 <div class="fragment">
@@ -976,7 +976,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <h2>Summary: Priors</h2>
 <ul>
 <li><p>Using weakly informative priors, we don’t have to explore the entire parameter space.</p></li>
-<li><p>Bayesian methods are inherently designed for hierarchical (multilevel) modeling thourgh priors.</p></li>
+<li><p>Bayesian methods are inherently designed for hierarchical (multilevel) modeling through priors.</p></li>
 </ul>
 </section></section>
 <section>
@@ -1579,7 +1579,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 </section>
 <section id="mcmc-markov-chain-monte-carlo" class="slide level2">
 <h2>MCMC (Markov Chain Monte Carlo)</h2>
-<p><strong>Goal</strong>: Aproximate the posterior distribution of parameters given the data instead of calculating it directly.</p>
+<p><strong>Goal</strong>: Approximate the posterior distribution of parameters given the data instead of calculating it directly.</p>
 <p><br></p>
 <div class="fragment">
 <p>For simple models, we can analytically find parameters that maximize the posterior distribution.</p>
@@ -1598,7 +1598,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <ul>
 <li class="fragment">Start with some values of <em>p</em> (e.g., 0.2 and 0.8).</li>
 <li class="fragment">Caclulate the posterior of those values.</li>
-<li class="fragment">Repeat the followings steps N times:
+<li class="fragment">Repeat the following steps N times:
 <ul>
 <li class="fragment">Propose a new value of <span class="math inline">\(p_{\text{new}}\)</span> (e.g., <span class="math inline">\(p \pm 0.01\)</span>)</li>
 <li class="fragment">Calculate the posterior at <span class="math inline">\(p_{\text{new}}\)</span>.</li>
@@ -1631,7 +1631,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <p><img data-src="images/traj.gif"></p>
 </div><div class="column" style="width:60%;">
 <ul>
-<li class="fragment"><p><span class="math inline">\(H(\theta, r) = U(\theta) + r^2/2\)</span> (Hamitonian: potential energy + kinetic energy = constant)</p>
+<li class="fragment"><p><span class="math inline">\(H(\theta, r) = U(\theta) + r^2/2\)</span> (Hamiltonian: potential energy + kinetic energy = constant)</p>
 <ul>
 <li class="fragment"><span class="math inline">\(U(\theta) = -\text{log}\; p(\theta \mid \text{data})\)</span></li>
 </ul></li>
@@ -1746,7 +1746,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <section id="interfaces-to-stan-for-r-users" class="slide level2">
 <h2>Interfaces to Stan (for R users)</h2>
 <ul>
-<li>Stan: The acutal modeling and inference engine, written in C++.</li>
+<li>Stan: The actual modeling and inference engine, written in C++.</li>
 </ul>
 <ul>
 <li class="fragment"><p>CmdStan: Command line interface (you write Stan code and run it via terminal).</p></li>
@@ -1755,7 +1755,7 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <li class="fragment"><p>In this course, we will use <code>cmdstanr</code> and <code>brms</code>.</p></li>
 </ul>
 <div class="footer">
-<p>CmdStan uses the latest version of Stan, whereas <code>rstan</code> is based on an older version.</p>
+<p>CmdStan is based on the latest version of Stan, whereas <code>rstan</code> is based on an older version.</p>
 </div>
 </section></section>
 <section>
