@@ -1696,6 +1696,8 @@ ggplot(samples_long, aes(x = iter, y = value, color = param)) +
 
 ::: {.column width=70%}
 
+:::incremental
+
 - Within each iteration, HMC simulates a trajectory using leapfrog steps.
 
     -  No-U-Turn Sampler (NUTS) dynamically determines the number of leapfrog steps; we only need to set the maximum (e.g., `max_treedepth` in **Stan**).
@@ -1704,6 +1706,7 @@ ggplot(samples_long, aes(x = iter, y = value, color = param)) +
 
 - Only the final parameter $\theta$ of each trajectory is kept as a posterior sample.
 
+:::
 :::
 :::
 
@@ -1775,6 +1778,7 @@ ggplot(samples_long, aes(x = iter, y = value, color = param)) +
 CmdStan uses the latest version of Stan, whereas `rstan` is based on an older version.
 :::
 
+# Stan Coding Session (separate HTML material)
 
 ## References
 
@@ -1789,6 +1793,5 @@ CmdStan uses the latest version of Stan, whereas `rstan` is based on an older ve
 - [AIcia Solid Project](https://youtu.be/mX_NpDD7wwg) (in Japanese and Math)
 
 
-# Stan Coding Session (separate HTML material)
 
 

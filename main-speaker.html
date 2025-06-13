@@ -1652,12 +1652,12 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <p><img data-src="images/hmc.gif"></p>
 </div><div class="column" style="width:70%;">
 <ul>
-<li><p>Within each iteration, HMC simulates a trajectory using leapfrog steps.</p>
+<li class="fragment"><p>Within each iteration, HMC simulates a trajectory using leapfrog steps.</p>
 <ul>
-<li>No-U-Turn Sampler (NUTS) dynamically determines the number of leapfrog steps; we only need to set the maximum (e.g., <code>max_treedepth</code> in <strong>Stan</strong>).</li>
+<li class="fragment">No-U-Turn Sampler (NUTS) dynamically determines the number of leapfrog steps; we only need to set the maximum (e.g., <code>max_treedepth</code> in <strong>Stan</strong>).</li>
 </ul></li>
-<li><p>The Hamiltonian stays the same, but momentum <span class="math inline">\(r\)</span> is resampled each iteration.</p></li>
-<li><p>Only the final parameter <span class="math inline">\(\theta\)</span> of each trajectory is kept as a posterior sample.</p></li>
+<li class="fragment"><p>The Hamiltonian stays the same, but momentum <span class="math inline">\(r\)</span> is resampled each iteration.</p></li>
+<li class="fragment"><p>Only the final parameter <span class="math inline">\(\theta\)</span> of each trajectory is kept as a posterior sample.</p></li>
 </ul>
 </div></div>
 </section>
@@ -1757,6 +1757,11 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <div class="footer">
 <p>CmdStan uses the latest version of Stan, whereas <code>rstan</code> is based on an older version.</p>
 </div>
+</section></section>
+<section>
+<section id="stan-coding-session-separate-html-material" class="title-slide slide level1 center">
+<h1>Stan Coding Session (separate HTML material)</h1>
+
 </section>
 <section id="references" class="slide level2">
 <h2>References</h2>
@@ -1767,11 +1772,8 @@ r_{m-1,n-1} + r_{m-1,n} + r_{m-1,n+1} + \\
 <li><p><a href="https://mc-stan.org/docs/functions-reference/index.html">Stan Functions Reference</a></p></li>
 <li><p><a href="https://youtu.be/mX_NpDD7wwg">AIcia Solid Project</a> (in Japanese and Math)</p></li>
 </ul>
-</section></section>
-<section id="stan-coding-session-separate-html-material" class="title-slide slide level1 center">
-<h1>Stan Coding Session (separate HTML material)</h1>
 
-</section>
+</section></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <p><img src="images/xtbg_logo.png" class="slide-logo"></p>
