@@ -4,7 +4,7 @@
 
 Slides and materials for 2025-06-14 at XTBG.
 
-View the accompanying slides [here](https://forest-canopy.github.io/assets/bayes-worskhop-xtbg/main.html)
+View the accompanying slides [here](https://forest-canopy.github.io/assets/bayes-workshop-xtbg/main.html)
 
 # References:
 
