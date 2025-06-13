@@ -958,7 +958,7 @@ tibble(x, prior = y * 10^29.5) %>%
 
 ##  Bayesian Update with Prior (Coin Toss)
 
-[Posteiror]{.orange} $\propto$ [Likelihood]{.teal} $\times$ [Prior]{.purple}
+[Posterior]{.orange} $\propto$ [Likelihood]{.teal} $\times$ [Prior]{.purple}
 
 ::: columns
 ::: {.column width="50%"}
@@ -1117,7 +1117,7 @@ $$
 
 - Using weakly informative priors, we don't have to explore the entire parameter space.
 
-- Bayesian methods are inherently designed for hierarchical (multilevel) modeling thourgh priors.
+- Bayesian methods are inherently designed for hierarchical (multilevel) modeling through priors.
 
 # Multilevel model Revisit
 
@@ -1565,7 +1565,7 @@ mcmc_trace(draws_array, n_warmup = 0, facet_args = list(nrow = 3)) +
 
 ## MCMC (Markov Chain Monte Carlo)
 
-**Goal**: Aproximate the posterior distribution of parameters given the data instead of calculating it directly.
+**Goal**: Approximate the posterior distribution of parameters given the data instead of calculating it directly.
 
 <br>
 
@@ -1595,7 +1595,7 @@ $p = 110/200 = 0.55$
 ::: incremental
 - Start with some values of *p* (e.g., 0.2 and 0.8).
 - Caclulate the posterior of those values.
-- Repeat the followings steps N times:
+- Repeat the following steps N times:
   - Propose a new value of $p_{\text{new}}$ (e.g., $p \pm 0.01$)
   - Calculate the posterior at $p_{\text{new}}$.
   - If $\text{Post}(p_{\text{new}}) \geq \text{Post}(p_t), \text{ then } p_{t+1} = p_{\text{new}}$.
@@ -1666,7 +1666,7 @@ ggplot(samples_long, aes(x = iter, y = value, color = param)) +
 
 :::incremental
 
-- $H(\theta, r) = U(\theta) + r^2/2$ (Hamitonian: potential energy + kinetic energy = constant)
+- $H(\theta, r) = U(\theta) + r^2/2$ (Hamiltonian: potential energy + kinetic energy = constant)
 
   - $U(\theta) = -\text{log}\; p(\theta \mid \text{data})$
 
@@ -1760,7 +1760,7 @@ ggplot(samples_long, aes(x = iter, y = value, color = param)) +
 
 ## Interfaces to Stan (for R users)
 
-- Stan: The acutal modeling and inference engine, written in C++.
+- Stan: The actual modeling and inference engine, written in C++.
 
 ::: incremental
 
@@ -1775,7 +1775,7 @@ ggplot(samples_long, aes(x = iter, y = value, color = param)) +
 :::
 
 ::: footer
-CmdStan uses the latest version of Stan, whereas `rstan` is based on an older version.
+CmdStan is based on the latest version of Stan, whereas `rstan` is based on an older version.
 :::
 
 # Stan Coding Session (separate HTML material)
