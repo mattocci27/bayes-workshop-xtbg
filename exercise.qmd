@@ -477,15 +477,6 @@ p2 <- p1 +
   scale_x_log10() +
   scale_y_log10()
 
-# p3 <- tmp2 |>
-#   ggplot(aes(x = x, y = y, col = sp)) +
-#   geom_smooth(method = "lm", se = TRUE, lty = 2,
-#     alpha = 0.2,
-#     linewidth = 0.5, col = "black") +
-#   geom_point(size = 3) +
-#   xlab("Wood density") +
-#   ylab("b") +
-#   theme(legend.position = "none")
 
 dbh_hist + h_hist + p1 + p2
 ```
@@ -769,7 +760,7 @@ priors <- c(
 )
 
 slope_fit_brm <- brm(
-  log(h) ~ log(dbh) + (log(dbh) | sp),
+  log(h) ~ log(dbh) + (1 + log(dbh) | sp),
   family = gaussian(),
   data = allo_df,
   prior = priors,
@@ -795,7 +786,7 @@ summary(slope_fit_brm)
 
 ```{r slope-lme4}
 slope_fit_lme <- lme4::lmer(
-  log(h) ~ log(dbh) + (log(dbh) | sp),
+  log(h) ~ log(dbh) + (1 + log(dbh) | sp),
   data = allo_df)
 ```
 
@@ -808,7 +799,7 @@ summary(slope_fit_lme)
 # Varying slopes and intercepts, and group-level predictors
 
 There is a power-law relationship ($y =\beta_0 x^{\beta_1}$) between tree diameter (DBH) and tree maximum height, and both the scaling factor $\beta_0$ and the expoent $\beta_1$ vary among species.
-Those species variation can be explained by wood density of each species.
+Those species variation can be explained by wood density (group-level predictor: $u$) of each species.
 
 $$
 \text{log}\; y_{ij} \sim N(\text{log}\; \beta_{0j} + \beta_{1j} x_{ij}, \sigma)
@@ -822,13 +813,102 @@ $$
 \sim
 \mathrm{MVN}
 \Biggl(
+\underbrace{
 \begin{bmatrix}
-\mu_{0} \\
-\mu_{1}
-\end{bmatrix},
+\gamma_{0}^{(\beta_0)} + \gamma_{1}^{(\beta_0)}u_{j}  \\
+\gamma_{0}^{(\beta_1)} + \gamma_{1}^{(\beta_1)}u_{j}
+\end{bmatrix}}_{\text{mean depends on }u_j},
 \begin{bmatrix}
 \sigma_{0}^2  & \rho \sigma_{0} \sigma_{1} \\
 \rho \sigma_{0} \sigma_{1} & \sigma_{1}^2
 \end{bmatrix}
 \Biggr)
 $$
+
+The rest of part is the same as the section Varying slopes and intercepts.
+
+```{r, eval=FALSE, echo=FALSE}
+p3 <- allo_df |>
+  ggplot(aes(x = x, y = y, col = sp)) +
+  geom_smooth(method = "lm", se = TRUE, lty = 2,
+    alpha = 0.2,
+    linewidth = 0.5, col = "black") +
+  geom_point(size = 3) +
+  xlab("Wood density") +
+  ylab("b") +
+  theme(legend.position = "none")
+```
+
+
+```{r}
+allo_vslope_list$L <- 2 # number of group-level predictors (intercept and wd)
+allo_vslope_list$u <- matrix(1, nrow = allo_vslope_list$L, ncol = allo_vslope_list$J)
+```
+
+```{r}
+vgrp_fit <- vslope_mod$sample(
+  data = allo_vslope_list,
+  seed = 1234,
+  chains = 4,
+  parallel_chains = 4,
+  iter_warmup = 1000, # number of warmup iterations
+  iter_sampling = 1000, # number of sampling iterations
+  adapt_delta = 0.95, # increase adapt_delta to avoid divergent transitions
+  max_treedepth = 15, # increase max_treedepth to avoid max treedepth errors
+  refresh = 0 # don't print update
+)
+
+vgrp_fit$summary()
+vgrp_fit$diagnostic_summary()
+```
+
+## brms
+
+```{r vgrp-brm}
+priors <- c(
+  prior(normal(0, 2.5), class = Intercept),
+  prior(normal(0, 2.5),   class = b),
+  prior(lkj(2), class = cor),                # Ω ~ LKJ(2)
+  prior(cauchy(0, 1),   class = sigma)
+)
+
+vgrp_fit_brm <- brm(
+  log(h) ~ log(dbh) * wd + (1 + log(dbh) | sp),
+  family = gaussian(),
+  data = allo_df,
+  prior = priors,
+  refresh = 0, # don't print update
+  control = list(
+    adapt_delta  = 0.95,  # default is 0.8
+    max_treedepth = 15    # default is 10
+  )
+)
+```
+
+```{r}
+summary(vgrp_fit_brm)
+```
+
+## lme4
+
+```{r group-lme4}
+grp_fit_lme <- lme4::lmer(
+  log(h) ~ log(dbh) * wd + (1 + log(dbh) | sp),
+  data = allo_df)
+```
+
+
+# References
+
+- Betancourt, M. (2017). [Diagnosing Biased Inference with Divergences](https://betanalpha.github.io/assets/case_studies/divergences_and_bias.html#3_a_non-centered_eight_schools_implementation).
+
+- [Gelman, A. et al. Bayesian Data Analysis, Third Edition. (Chapman & Hall/CRC, 2013)](http://www.stat.columbia.edu/~gelman/book/)
+
+- [Stan User's Guide](https://mc-stan.org/docs/stan-users-guide/index.html)
+
+- [Stan Functions Reference](https://mc-stan.org/docs/functions-reference/index.html)
+
+
+```{r}
+devtools::session_info()
+```
